@@ -95,19 +95,6 @@ input[type="number"] {
   display: block;
 }
 
-/* .help-button {
-  text-align: center;
-  border-radius: 10px;
-  border: 2px solid rgb(0, 113, 189);
-  color: rgb(0, 113, 189);
-  background-color: rgba(100, 100, 100, 0);
-  padding: 5px 2.5vw;
-  font-size: 16px;
-  font-family: "Quicksand";
-  margin: 6px;
-  display: inline-block;
-} */
-
 .file-button {
   text-align: center;
   border-radius: 10px;
