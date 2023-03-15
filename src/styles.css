@@ -1,0 +1,173 @@
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@600;500;600&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: "Quicksand";
+  color: white;
+  background-color: #292929;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.flex-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-item-left {
+  background-color: #292929;
+  flex: 20%;
+  padding: 20px;
+}
+
+#gl-canvas {
+  background-color: #525252;
+  display: block;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.button-group .button-elmt {
+  display: block;
+  margin: 6px;
+}
+
+.button{
+  width: 1px;
+  height: 1px;
+}
+
+.button-group button {
+  font-family: "Quicksand";
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  width: 8vw;
+}
+
+.bottom-div {
+  display: flex;
+  flex-direction: column;
+}
+
+input[type="number"] {
+  width: 50px;
+  font-size: 14px;
+}
+
+#help-canvas {
+  text-align: center;
+  border-radius: 10px;
+  border: 2px solid rgb(0, 113, 189);
+  color: rgb(0, 113, 189);
+  background-color: rgba(100, 100, 100, 0);
+  padding: 5px 2.5vw;
+  font-size: 16px;
+  font-family: "Quicksand";
+  margin: 6px;
+  display: inline-block;
+}
+
+#clear-canvas {
+  text-align: center;
+  border-radius: 10px;
+  border: 2px solid rgb(175, 0, 0);
+  color: rgb(175, 0, 0);
+  background-color: rgba(100, 100, 100, 0);
+  padding: 8px 2.5vw;
+  font-size: 16px;
+  font-family: "Quicksand";
+  margin: 6px;
+  display: block;
+}
+
+/* .help-button {
+  text-align: center;
+  border-radius: 10px;
+  border: 2px solid rgb(0, 113, 189);
+  color: rgb(0, 113, 189);
+  background-color: rgba(100, 100, 100, 0);
+  padding: 5px 2.5vw;
+  font-size: 16px;
+  font-family: "Quicksand";
+  margin: 6px;
+  display: inline-block;
+} */
+
+.file-button {
+  text-align: center;
+  border-radius: 10px;
+  border: 2px solid rgb(0, 113, 189);
+  color: rgb(0, 113, 189);
+  background-color: rgba(100, 100, 100, 0);
+  padding: 5px 2.5vw;
+  font-size: 16px;
+  font-family: "Quicksand";
+  margin: 6px;
+  display: inline-block;
+}
+
+.file-button:disabled{
+  color: rgb(100, 100, 100);
+  border: 2px solid rgb(100, 100, 100);
+}
+
+.file-button:hover, #help-canvas:hover {
+  background-color: white;
+}
+
+.file-button:hover, #clear-canvas:hover {
+  background-color: white;
+}
+
+#range-slider {
+  visibility: hidden;
+  padding-top: 20px;
+}
+
+#input-resize{
+  visibility: hidden;
+  display: inline-block;
+}
+
+#rotate {
+  margin-bottom: 0px;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+input[type="text"]{
+  font-size: 16px;
+  font-family: "Quicksand";
+  border-radius: 4px;
+  padding: 8px;
+}
+
+#resizeX, #resizeY{
+  width:100px;
+}
+
+.inline-flex {
+  display: flex; 
+  flex-direction: row;
+}
+
+#color-picker{
+  margin: 12px;
+}
