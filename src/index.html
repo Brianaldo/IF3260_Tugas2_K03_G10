@@ -1,132 +1,260 @@
 <!DOCTYPE html>
-<html lang = "en">
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hollow Objects - G10</title>
 
-    <head>
-        <meta charset = "utf-8"/>
-        <title>Hollow Objects - G10</title>
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link href="styles.css" rel="stylesheet" />
 
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
-        <link href = "styles.css" rel = "stylesheet"></link>
+    <!-- Math -->
+    <script src="Math/common.js" defer></script>
+    <script src="Math/Matrix.js" defer></script>
+    <script src="Math/Vector3.js" defer></script>
 
-    </head>
+    <!-- Shader -->
+    <script src="Shader/fragment_shader.glsl.js" defer></script>
+    <script src="Shader/vertex_shader.glsl.js" defer></script>
 
-    <body>
-        <div class = "flex-container">
-            <div style="width: 25vw; padding: 30px;">
-                <h1 style="font-size:20px;">Hollow Objects - G10</h1>
-                <div> 
-                    <div class = "inline-flex">
-                        <p>Color: </p>
-                        <input type = "color" id = "color-picker" class = "button-elmt" value = #00FF00>
-                    </div>
-                    <div>
-                      Projection:
-                      <select id="perspectiveOption" name="perspectiveOption">
-                        <option value="perspective" selected="selected">perspective</option>
-                        <option value="orthographic">orthographic</option>
-                        <option value="oblique">oblique</option>
-                      </select>
-                    </div>
-                    <br>
-                    <div>
-                      <label for="rotasiX">Rotation X:</label>
-                      <input type="range" name="rotasiX" min="-180" max="180" value="0" id="rotasiX"
-                          oninput="this.nextElementSibling.value = this.value">
-                      <output>0</output>
-                      <br>
-                      <label for="rotasiY">Rotation Y:</label>
-                      <input type="range" name="rotasiY" min="-180" max="180" value="0" id="rotasiY"
-                          oninput="this.nextElementSibling.value = this.value">
-                      <output>0</output>
-                      <br>
-                      <label for="rotasiZ">Rotation Z:</label>
-                      <input type="range" name="rotasiZ" min="-180" max="180" value="30" id="rotasiZ"
-                          oninput="this.nextElementSibling.value = this.value">
-                      <output>0</output>
-                      <br>
-                      <br>
-                      <label for="translasiX">Translation X:</label>
-                      <input type="range" name="translasiX" min="-100" max="100" value="0" id="translasiX"
-                          oninput="this.nextElementSibling.value = this.value">
-                      <output>0</output>
-                      <br>
-                      <label for="translasiY">Translation Y:</label>
-                      <input type="range" name="translasiY" min="-100" max="100" value="0" id="translasiY"
-                          oninput="this.nextElementSibling.value = this.value">
-                      <output>0</output>
-                      <br>
-                      <label for="translasiZ">Translation Z:</label>
-                      <input type="range" name="translasiZ" min="-100" max="100" value="0" id="translasiZ"
-                          oninput="this.nextElementSibling.value = this.value">
-                      <output>0</output>
-                      <br>
-                      <br>
-                      <label for="scalingX">Scale X:</label>
-                      <input type="range" name="scalingX" min="0" max="3" value="1" step="0.1" id="scalingX"
-                          oninput="this.nextElementSibling.value = this.value">
-                      <output>1</output>
-                      <br>
-                      <label for="scalingY">Scale Y:</label>
-                      <input type="range" name="scalingY" min="0" max="3" value="1" step="0.1" id="scalingY"
-                          oninput="this.nextElementSibling.value = this.value">
-                      <output>1</output>
-                      <br>
-                      <label for="scalingZ">Scale Z:</label>
-                      <input type="range" name="scalingZ" min="0" max="3" value="1" step="0.1" id="scalingZ"
-                          oninput="this.nextElementSibling.value = this.value">
-                      <output>1</output>
-                    </div>
-                    <br>
-                    <div>
-                      <label for="cam-radius">Radius Camera:</label>
-                      <input type="range" name="cam-radius" min="0" id="cam-radius" max="1" step="0.005" value="0.1"
-                          oninput="this.nextElementSibling.value = this.value">
-                      <output>0.1</output>
-                      <br>
-                      <label for="eye-y">Angle Camera:</label>
-                      <input type="range" name="cam-rotation" min="0" id="cam-rotation" max="360" value="60" oninput="this.nextElementSibling.value = this.value">
-                      <output>60</output>
-                    </div>
-                    <br>
-                    <div>
-                      <label for="shading">Shading: </label>
-                      <input type="checkbox" id="shading" name="shading" value="shading" checked>
-                    </div>
-      
-                    <div>
-                      <label for="shading">Idle animation: </label>
-                      <input type="checkbox" id="idle" name="idle" value="idle" checked>
-                    </div>
-                    <br>
-                    <button id = "clear-canvas">Clear Canvas</button>
-                    <button id = "help-canvas">help</button>
-                    <label class = "file-button">
-                        <input type = "file" id = "load-file">
-                        Upload File
-                    </label>
-                   
-                    <div class = "inline-flex">
-                        <button id = "save-button" class = "file-button" style ="display: inline-block;">Save Canvas</button>
-                        <input type = "text" id = "filename" class = "input-text" value = "" placeholder = "Input canvas output file name" required >
-                    </div>
-                    <div class = "inline-flex">
-                        <button id = "save-model" class = "file-button" disabled >Save Model</button>
-                        <input type = "text" id = "model-filename" class = "input-text" value = "" placeholder = "Input model output file name" required>
-                    </div>
-                </div>
-            </div>
+    <!-- Utils -->
+    <script src="Utils/webgl-utils.js" defer></script>
+    <script src="Utils/shader.js" defer></script>
 
+    <!-- Main -->
+    <script src="script.js" defer></script>
+  </head>
 
-            <div class = "flex-item-right">
-                <canvas id = "gl-canvas" width = 1300 height = 1300></canvas>
-            </div>
+  <body>
+    <div class="flex-container">
+      <div style="width: 25vw; padding: 30px">
+        <h1 style="font-size: 20px">Hollow Objects - G10</h1>
+        <div>
+          <div class="inline-flex">
+            <p>Color:</p>
+            <input
+              type="color"
+              id="color-picker"
+              class="button-elmt"
+              value="#00FF00"
+            />
+          </div>
+          <div>
+            Projection:
+            <select id="perspectiveOption" name="perspectiveOption">
+              <option value="perspective" selected="selected">
+                perspective
+              </option>
+              <option value="orthographic">orthographic</option>
+              <option value="oblique">oblique</option>
+            </select>
+          </div>
+          <br />
+          <div>
+            <label for="rotasiX">Rotation X:</label>
+            <input
+              type="range"
+              name="rotasiX"
+              min="-180"
+              max="180"
+              value="0"
+              id="rotasiX"
+              oninput="this.nextElementSibling.value = this.value"
+            />
+            <output>0</output>
+            <br />
+            <label for="rotasiY">Rotation Y:</label>
+            <input
+              type="range"
+              name="rotasiY"
+              min="-180"
+              max="180"
+              value="0"
+              id="rotasiY"
+              oninput="this.nextElementSibling.value = this.value"
+            />
+            <output>0</output>
+            <br />
+            <label for="rotasiZ">Rotation Z:</label>
+            <input
+              type="range"
+              name="rotasiZ"
+              min="-180"
+              max="180"
+              value="30"
+              id="rotasiZ"
+              oninput="this.nextElementSibling.value = this.value"
+            />
+            <output>0</output>
+            <br />
+            <br />
+            <label for="translasiX">Translation X:</label>
+            <input
+              type="range"
+              name="translasiX"
+              min="-100"
+              max="100"
+              value="0"
+              id="translasiX"
+              oninput="this.nextElementSibling.value = this.value"
+            />
+            <output>0</output>
+            <br />
+            <label for="translasiY">Translation Y:</label>
+            <input
+              type="range"
+              name="translasiY"
+              min="-100"
+              max="100"
+              value="0"
+              id="translasiY"
+              oninput="this.nextElementSibling.value = this.value"
+            />
+            <output>0</output>
+            <br />
+            <label for="translasiZ">Translation Z:</label>
+            <input
+              type="range"
+              name="translasiZ"
+              min="-100"
+              max="100"
+              value="0"
+              id="translasiZ"
+              oninput="this.nextElementSibling.value = this.value"
+            />
+            <output>0</output>
+            <br />
+            <br />
+            <label for="scalingX">Scale X:</label>
+            <input
+              type="range"
+              name="scalingX"
+              min="0"
+              max="3"
+              value="1"
+              step="0.1"
+              id="scalingX"
+              oninput="this.nextElementSibling.value = this.value"
+            />
+            <output>1</output>
+            <br />
+            <label for="scalingY">Scale Y:</label>
+            <input
+              type="range"
+              name="scalingY"
+              min="0"
+              max="3"
+              value="1"
+              step="0.1"
+              id="scalingY"
+              oninput="this.nextElementSibling.value = this.value"
+            />
+            <output>1</output>
+            <br />
+            <label for="scalingZ">Scale Z:</label>
+            <input
+              type="range"
+              name="scalingZ"
+              min="0"
+              max="3"
+              value="1"
+              step="0.1"
+              id="scalingZ"
+              oninput="this.nextElementSibling.value = this.value"
+            />
+            <output>1</output>
+          </div>
+          <br />
+          <div>
+            <label for="cam-radius">Radius Camera:</label>
+            <input
+              type="range"
+              name="cam-radius"
+              min="0"
+              id="cam-radius"
+              max="1"
+              step="0.005"
+              value="0.1"
+              oninput="this.nextElementSibling.value = this.value"
+            />
+            <output>0.1</output>
+            <br />
+            <label for="eye-y">Angle Camera:</label>
+            <input
+              type="range"
+              name="cam-rotation"
+              min="0"
+              id="cam-rotation"
+              max="360"
+              value="60"
+              oninput="this.nextElementSibling.value = this.value"
+            />
+            <output>60</output>
+          </div>
+          <br />
+          <div>
+            <label for="shading">Shading: </label>
+            <input
+              type="checkbox"
+              id="shading"
+              name="shading"
+              value="shading"
+              checked
+            />
+          </div>
 
+          <div>
+            <label for="shading">Idle animation: </label>
+            <input type="checkbox" id="idle" name="idle" value="idle" checked />
+          </div>
+          <br />
+          <button id="clear-canvas">Clear Canvas</button>
+          <button id="help-canvas">help</button>
+          <label class="file-button">
+            <input type="file" id="load-file" />
+            Upload File
+          </label>
+
+          <div class="inline-flex">
+            <button
+              id="save-button"
+              class="file-button"
+              style="display: inline-block"
+            >
+              Save Canvas
+            </button>
+            <input
+              type="text"
+              id="filename"
+              class="input-text"
+              value=""
+              placeholder="Input canvas output file name"
+              required
+            />
+          </div>
+          <div class="inline-flex">
+            <button id="save-model" class="file-button" disabled>
+              Save Model
+            </button>
+            <input
+              type="text"
+              id="model-filename"
+              class="input-text"
+              value=""
+              placeholder="Input model output file name"
+              required
+            />
+          </div>
         </div>
+      </div>
 
-    </body>
-    <script src = "Utils/shader.js"></script>
-    <script src = "script.js"></script>
+      <div class="flex-item-right">
+        <canvas id="gl-canvas" width="1300" height="1300"></canvas>
+      </div>
+    </div>
+  </body>
 </html>

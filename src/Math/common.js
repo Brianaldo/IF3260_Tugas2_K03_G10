@@ -1,0 +1,7 @@
+function toRadian(degrees) {
+  return (degrees * Math.PI) / 180;
+}
+
+function flatten(array) {
+  return array.reduce((acc, val) => acc.concat(val), []);
+}

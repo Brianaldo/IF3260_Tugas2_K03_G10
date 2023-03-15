@@ -5,6 +5,10 @@ class Matrix {
     this.cols = matrix[0].length;
   }
 
+  getFlattenMatrix() {
+    return flatten(this.matrix);
+  }
+
   static identity(size) {
     let matrix = [];
     for (let i = 0; i < size; i++) {
@@ -48,5 +52,48 @@ class Matrix {
       }
     }
     return new Matrix(result_matrix);
+  }
+
+  static lookAt(eye, target, up) {
+    let z = Vector3.normalize(Vector3.subtract(eye, target));
+    let x = Vector3.normalize(Vector3.cross(up, z));
+    let y = Vector3.cross(z, x);
+
+    let matrix = [
+      [x.x, x.y, x.z, -Vector3.dot(x, eye)],
+      [y.x, y.y, y.z, -Vector3.dot(y, eye)],
+      [z.x, z.y, z.z, -Vector3.dot(z, eye)],
+      [0, 0, 0, 1],
+    ];
+    return new Matrix(matrix);
+  }
+
+  static perspective(fov, aspect, near, far) {
+    let f = 1.0 / Math.tan(fov / 2);
+    let matrix = [
+      [f / aspect, 0, 0, 0],
+      [0, f, 0, 0],
+      [0, 0, (far + near) / (near - far), (2 * far * near) / (near - far)],
+      [0, 0, -1, 0],
+    ];
+    return new Matrix(matrix);
+  }
+
+  static rotate(matrix, rad, axis) {
+    let c = Math.cos(rad);
+    let s = Math.sin(rad);
+    let t = 1 - c;
+    let x = axis.x;
+    let y = axis.y;
+    let z = axis.z;
+
+    let rotation_matrix = [
+      [t * x * x + c, t * x * y - s * z, t * x * z + s * y, 0],
+      [t * x * y + s * z, t * y * y + c, t * y * z - s * x, 0],
+      [t * x * z - s * y, t * y * z + s * x, t * z * z + c, 0],
+      [0, 0, 0, 1],
+    ];
+
+    return Matrix.multiply(matrix, new Matrix(rotation_matrix));
   }
 }
