@@ -54,29 +54,19 @@ class Matrix {
     return new Matrix(result_matrix);
   }
 
-  static lookAt(eye, target, up) {
-    let z = Vector3.normalize(Vector3.subtract(eye, target));
-    let x = Vector3.normalize(Vector3.cross(up, z));
-    let y = Vector3.cross(z, x);
-
-    let matrix = [
-      [x.x, x.y, x.z, -Vector3.dot(x, eye)],
-      [y.x, y.y, y.z, -Vector3.dot(y, eye)],
-      [z.x, z.y, z.z, -Vector3.dot(z, eye)],
-      [0, 0, 0, 1],
-    ];
+  static translate(matrix, transX, transY, transZ){
+    for(let i = 0; i<4; i++) matrix[3][i] += (matrix[0][i]*transX + matrix[1][i]*transY + matrix[2][i]*transZ);
     return new Matrix(matrix);
   }
 
-  static perspective(fov, aspect, near, far) {
-    let f = 1.0 / Math.tan(fov / 2);
-    let matrix = [
-      [f / aspect, 0, 0, 0],
-      [0, f, 0, 0],
-      [0, 0, (far + near) / (near - far), (2 * far * near) / (near - far)],
-      [0, 0, -1, 0],
+  static transpose(matrix){
+    let newMatrix = [
+      [matrix[0][0], matrix[1][0], matrix[2][0], matrix[3][0]],
+      [matrix[0][1], matrix[1][1], matrix[2][1], matrix[3][1]],
+      [matrix[0][2], matrix[1][2], matrix[2][2], matrix[3][2]],
+      [matrix[0][3], matrix[1][3], matrix[2][3], matrix[3][3]],
     ];
-    return new Matrix(matrix);
+    return new Matrix(newMatrix);
   }
 
   static rotate(matrix, rad, axis) {
@@ -95,5 +85,54 @@ class Matrix {
     ];
 
     return Matrix.multiply(matrix, new Matrix(rotation_matrix));
+  }
+
+  static lookAt(eye, target, up) {
+    let z = Vector3.normalize(Vector3.subtract(eye, target));
+    let x = Vector3.normalize(Vector3.cross(up, z));
+    let y = Vector3.cross(z, x);
+
+    let matrix = [
+      [x.x, x.y, x.z, -Vector3.dot(x, eye)],
+      [y.x, y.y, y.z, -Vector3.dot(y, eye)],
+      [z.x, z.y, z.z, -Vector3.dot(z, eye)],
+      [0, 0, 0, 1],
+    ];
+    return new Matrix(matrix);
+  }
+
+  static scale(matrix, scaleX, scaleY, scaleZ){
+    for(let i = 0; i<4; i++) matrix[0][i] *= scaleX;
+    for(let i = 0; i<4; i++) matrix[1][i] *= scaleY;
+    for(let i = 0; i<4; i++) matrix[2][i] *= scaleZ;
+    return new Matrix(matrix);
+  }
+
+  static perspective(fov, aspect, near, far) {
+    let f = 1.0 / Math.tan(fov / 2);
+    let matrix = [
+      [f / aspect, 0, 0, 0],
+      [0, f, 0, 0],
+      [0, 0, (far + near) / (near - far), (2 * far * near) / (near - far)],
+      [0, 0, -1, 0],
+    ];
+    if(far==null || far==Infinity){
+      matrix[2][2] = -1;
+      matrix[2][3] = -2*near;
+    }
+    return new Matrix(matrix);
+  }
+
+  static oblique(out, theta, phi){
+    var cotT = -1/Math.tan(toRadian(theta));
+    var cotP = -1/Math.tan(toRadian(phi));
+    let matrix = [
+      [1,0,cotT,0],
+      [0,1,cotP,0],
+      [0,0,1,0],
+      [0,0,0,1],
+    ];
+    matrix = this.transpose(matrix);
+    return new Matrix(matrix);
   }
 }
