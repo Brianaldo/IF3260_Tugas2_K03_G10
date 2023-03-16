@@ -102,7 +102,6 @@ window.onload = function main() {
   gl.enableVertexAttribArray(positionAttribLocation);
   gl.enableVertexAttribArray(colorAttribLocation);
 
-  // Tell OpenGL state machine which program should be active.
   gl.useProgram(program);
 
   var matWorldUniformLocation = gl.getUniformLocation(program, "mWorld");
@@ -126,11 +125,6 @@ window.onload = function main() {
   gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, viewMatrix);
   gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, projMatrix);
 
-  var yRotationMatrix = new Float32Array(16);
-
-  //
-  // Main render loop
-  //
   var identityMatrix = Matrix.identity(4);
   var angle = 0;
   var loop = function () {
