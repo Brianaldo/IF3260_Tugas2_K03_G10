@@ -1,3 +1,19 @@
+var state;
+
+function defaultview(){
+  state = {
+    animation: true,
+    timeout: 0
+  }
+}
+
+function animationidle(e){
+  state.animation = document.getElementById("idle").checked;
+  console.log(state.animation);
+}
+
+document.getElementById("idle").addEventListener("change", animationidle);
+
 window.onload = function main() {
   const canvas = document.getElementById(`gl-canvas`);
   const gl = WebGLUtils.setupWebGL(canvas, {
@@ -24,28 +40,40 @@ window.onload = function main() {
   var boxVertices = [
     // X, Y, Z           R, G, B
     // Top
-    -1.0, 1.0, -1.0, 0.5, 0.5, 0.5, -1.0, 1.0, 1.0, 0.5, 0.5, 0.5, 1.0, 1.0,
-    1.0, 0.5, 0.5, 0.5, 1.0, 1.0, -1.0, 0.5, 0.5, 0.5,
+    -1.0, 1.0, -1.0, 0.5, 0.5, 0.5, 
+    -1.0, 1.0, 1.0, 0.5, 0.5, 0.5, 
+    1.0, 1.0, 1.0, 0.5, 0.5, 0.5, 
+    1.0, 1.0, -1.0, 0.5, 0.5, 0.5,
 
     // Left
-    -1.0, 1.0, 1.0, 0.75, 0.25, 0.5, -1.0, -1.0, 1.0, 0.75, 0.25, 0.5, -1.0,
-    -1.0, -1.0, 0.75, 0.25, 0.5, -1.0, 1.0, -1.0, 0.75, 0.25, 0.5,
+    -1.0, 1.0, 1.0, 0.75, 0.25, 0.5,
+    -1.0, -1.0, 1.0, 0.75, 0.25, 0.5,
+    -1.0, -1.0, -1.0, 0.75, 0.25, 0.5,
+    -1.0, 1.0, -1.0, 0.75, 0.25, 0.5,
 
     // Right
-    1.0, 1.0, 1.0, 0.25, 0.25, 0.75, 1.0, -1.0, 1.0, 0.25, 0.25, 0.75, 1.0,
-    -1.0, -1.0, 0.25, 0.25, 0.75, 1.0, 1.0, -1.0, 0.25, 0.25, 0.75,
+    1.0, 1.0, 1.0, 0.25, 0.25, 0.75,
+    1.0, -1.0, 1.0, 0.25, 0.25, 0.75,
+    1.0, -1.0, -1.0, 0.25, 0.25, 0.75,
+    1.0, 1.0, -1.0, 0.25, 0.25, 0.75,
 
     // Front
-    1.0, 1.0, 1.0, 1.0, 0.0, 0.15, 1.0, -1.0, 1.0, 1.0, 0.0, 0.15, -1.0, -1.0,
-    1.0, 1.0, 0.0, 0.15, -1.0, 1.0, 1.0, 1.0, 0.0, 0.15,
+    1.0, 1.0, 1.0, 1.0, 0.0, 0.15,
+    1.0, -1.0, 1.0, 1.0, 0.0, 0.15,
+    -1.0, -1.0, 1.0, 1.0, 0.0, 0.15,
+    -1.0, 1.0, 1.0, 1.0, 0.0, 0.15,
 
     // Back
-    1.0, 1.0, -1.0, 0.0, 1.0, 0.15, 1.0, -1.0, -1.0, 0.0, 1.0, 0.15, -1.0, -1.0,
-    -1.0, 0.0, 1.0, 0.15, -1.0, 1.0, -1.0, 0.0, 1.0, 0.15,
+    1.0, 1.0, -1.0, 0.0, 1.0, 0.15, 
+    1.0, -1.0, -1.0, 0.0, 1.0, 0.15,
+    -1.0, -1.0, -1.0, 0.0, 1.0, 0.15,
+    -1.0, 1.0, -1.0, 0.0, 1.0, 0.15,
 
     // Bottom
-    -1.0, -1.0, -1.0, 0.5, 0.5, 1.0, -1.0, -1.0, 1.0, 0.5, 0.5, 1.0, 1.0, -1.0,
-    1.0, 0.5, 0.5, 1.0, 1.0, -1.0, -1.0, 0.5, 0.5, 1.0,
+    -1.0, -1.0, -1.0, 0.5, 0.5, 1.0,
+    -1.0, -1.0, 1.0, 0.5, 0.5, 1.0,
+    1.0, -1.0, 1.0, 0.5, 0.5, 1.0, 
+    1.0, -1.0, -1.0, 0.5, 0.5, 1.0,
   ];
 
   var boxIndices = [
@@ -127,8 +155,13 @@ window.onload = function main() {
 
   var identityMatrix = Matrix.identity(4);
   var angle = 0;
+
+  defaultview();
   var loop = function () {
-    angle = (performance.now() / 1000 / 6) * 2 * Math.PI;
+    if(state.animation){
+      state.timeout++;
+      angle = (state.timeout)/300 * Math.PI;
+    }
     const yRotationMatrix = Matrix.rotate(
       identityMatrix,
       angle,
@@ -149,7 +182,6 @@ window.onload = function main() {
     gl.clearColor(0.75, 0.85, 0.8, 1.0);
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
     gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
-
     requestAnimationFrame(loop);
   };
   requestAnimationFrame(loop);
