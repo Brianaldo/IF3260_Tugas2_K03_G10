@@ -6,7 +6,7 @@ class Matrix {
   }
 
   getFlattenMatrix() {
-    return flatten(this.matrix);
+    return new Float32Array(flatten(this.matrix));
   }
 
   static identity(size) {
@@ -54,12 +54,14 @@ class Matrix {
     return new Matrix(result_matrix);
   }
 
-  static translate(matrix, transX, transY, transZ){
-    for(let i = 0; i<4; i++) matrix[3][i] += (matrix[0][i]*transX + matrix[1][i]*transY + matrix[2][i]*transZ);
+  static translate(matrix, transX, transY, transZ) {
+    for (let i = 0; i < 4; i++)
+      matrix[3][i] +=
+        matrix[0][i] * transX + matrix[1][i] * transY + matrix[2][i] * transZ;
     return new Matrix(matrix);
   }
 
-  static transpose(matrix){
+  static transpose(matrix) {
     let newMatrix = [
       [matrix[0][0], matrix[1][0], matrix[2][0], matrix[3][0]],
       [matrix[0][1], matrix[1][1], matrix[2][1], matrix[3][1]],
@@ -69,68 +71,89 @@ class Matrix {
     return new Matrix(newMatrix);
   }
 
-  static rotate(matrix, rad, axis) {
-    let c = Math.cos(rad);
-    let s = Math.sin(rad);
-    let t = 1 - c;
-    let x = axis.x;
-    let y = axis.y;
-    let z = axis.z;
+  static rotate(a, rad, axis) {
+    const s = Math.sin(rad);
+    const c = Math.cos(rad);
+    const t = 1 - c;
 
-    let rotation_matrix = [
-      [t * x * x + c, t * x * y - s * z, t * x * z + s * y, 0],
-      [t * x * y + s * z, t * y * y + c, t * y * z - s * x, 0],
-      [t * x * z - s * y, t * y * z + s * x, t * z * z + c, 0],
+    const rotation_matrix = new Matrix([
+      [
+        t * axis.x * axis.x + c,
+        t * axis.x * axis.y + s * axis.z,
+        t * axis.x * axis.z - s * axis.y,
+        0,
+      ],
+      [
+        t * axis.x * axis.y - s * axis.z,
+        t * axis.y * axis.y + c,
+        t * axis.y * axis.z + s * axis.x,
+        0,
+      ],
+      [
+        t * axis.x * axis.z + s * axis.y,
+        t * axis.y * axis.z - s * axis.x,
+        t * axis.z * axis.z + c,
+        0,
+      ],
       [0, 0, 0, 1],
-    ];
+    ]);
 
-    return Matrix.multiply(matrix, new Matrix(rotation_matrix));
+    return Matrix.multiply(a, rotation_matrix);
   }
 
-  static lookAt(eye, target, up) {
-    let z = Vector3.normalize(Vector3.subtract(eye, target));
+  static lookAt(eye, center, up) {
+    if (
+      Math.abs(eye.x - center.x) < EPSILON &&
+      Math.abs(eye.y - center.y) < EPSILON &&
+      Math.abs(eye.z - center.z) < EPSILON
+    ) {
+      return Matrix.identity(4);
+    }
+
+    let z = Vector3.normalize(Vector3.subtract(eye, center));
     let x = Vector3.normalize(Vector3.cross(up, z));
-    let y = Vector3.cross(z, x);
+    let y = Vector3.normalize(Vector3.cross(z, x));
 
-    let matrix = [
-      [x.x, x.y, x.z, -Vector3.dot(x, eye)],
-      [y.x, y.y, y.z, -Vector3.dot(y, eye)],
-      [z.x, z.y, z.z, -Vector3.dot(z, eye)],
-      [0, 0, 0, 1],
-    ];
+    return new Matrix([
+      [x.x, y.x, z.x, 0],
+      [x.y, y.y, z.y, 0],
+      [x.z, y.z, z.z, 0],
+      [
+        -(x.x * eye.x + x.y * eye.y + x.z * eye.z),
+        -(y.x * eye.x + y.y * eye.y + y.z * eye.z),
+        -(z.x * eye.x + z.y * eye.y + z.z * eye.z),
+        1,
+      ],
+    ]);
+  }
+
+  static scale(matrix, scaleX, scaleY, scaleZ) {
+    for (let i = 0; i < 4; i++) matrix[0][i] *= scaleX;
+    for (let i = 0; i < 4; i++) matrix[1][i] *= scaleY;
+    for (let i = 0; i < 4; i++) matrix[2][i] *= scaleZ;
     return new Matrix(matrix);
   }
 
-  static scale(matrix, scaleX, scaleY, scaleZ){
-    for(let i = 0; i<4; i++) matrix[0][i] *= scaleX;
-    for(let i = 0; i<4; i++) matrix[1][i] *= scaleY;
-    for(let i = 0; i<4; i++) matrix[2][i] *= scaleZ;
-    return new Matrix(matrix);
-  }
+  static perspective(fovy, aspect, near, far) {
+    const f = 1.0 / Math.tan(fovy / 2);
+    const nf = 1 / (near - far);
 
-  static perspective(fov, aspect, near, far) {
-    let f = 1.0 / Math.tan(fov / 2);
-    let matrix = [
+    return new Matrix([
       [f / aspect, 0, 0, 0],
       [0, f, 0, 0],
-      [0, 0, (far + near) / (near - far), (2 * far * near) / (near - far)],
-      [0, 0, -1, 0],
-    ];
-    if(far==null || far==Infinity){
-      matrix[2][2] = -1;
-      matrix[2][3] = -2*near;
-    }
-    return new Matrix(matrix);
+      [0, 0, (far + near) * nf, -1],
+      [0, 0, 2 * far * near * nf, 0],
+    ]);
   }
 
-  static oblique(out, theta, phi){
-    var cotT = -1/Math.tan(toRadian(theta));
-    var cotP = -1/Math.tan(toRadian(phi));
+  static oblique(out, theta, phi) {
+    var cotT = -1 / Math.tan(toRadian(theta));
+    var cotP = -1 / Math.tan(toRadian(phi));
     let matrix = [
-      [1,0,cotT,0],
-      [0,1,cotP,0],
-      [0,0,1,0],
-      [0,0,0,1],
+      [1, 0, cotT, 0],
+      [0, 1, cotP, 0],
+      [0, 0, 1, 0],
+      [0, 0, 0, 1],
     ];
     matrix = this.transpose(matrix);
     return new Matrix(matrix);

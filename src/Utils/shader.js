@@ -22,8 +22,8 @@ function initShaders(gl, vsSource = VERTEX_SHADER, fsSource = FRAGMENT_SHADER) {
 
   gl.attachShader(shaderProgram, vertexShader);
   gl.attachShader(shaderProgram, fragmentShader);
-  gl.linkProgram(shaderProgram);
 
+  gl.linkProgram(shaderProgram);
   if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
     console.error(
       `Unable to initialize shader program: ${gl.getProgramInfoLog(
@@ -32,6 +32,20 @@ function initShaders(gl, vsSource = VERTEX_SHADER, fsSource = FRAGMENT_SHADER) {
     );
     throw new Error(
       `Unable to initialize shader program: ${gl.getProgramInfoLog(
+        shaderProgram
+      )}`
+    );
+  }
+
+  gl.validateProgram(shaderProgram);
+  if (!gl.getProgramParameter(shaderProgram, gl.VALIDATE_STATUS)) {
+    console.error(
+      `Unable to validate shader program: ${gl.getProgramInfoLog(
+        shaderProgram
+      )}`
+    );
+    throw new Error(
+      `Unable to validate shader program: ${gl.getProgramInfoLog(
         shaderProgram
       )}`
     );

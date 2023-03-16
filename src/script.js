@@ -11,6 +11,7 @@ window.onload = function main() {
   canvas.width = innerHeight;
   canvas.height = innerHeight;
 
+  gl.viewport(0, 0, canvas.width, canvas.height);
   gl.clearColor(0.75, 0.85, 0.8, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.enable(gl.DEPTH_TEST);
@@ -18,15 +19,7 @@ window.onload = function main() {
   gl.frontFace(gl.CCW);
   gl.cullFace(gl.BACK);
 
-  const program = initShaders(gl);
-
-  const programInfo = {
-    program: program,
-    attribLocations: {
-      vertexPosition: gl.getAttribLocation(program, "aVertexPosition"),
-      vertexColor: gl.getAttribLocation(program, "aVertexColor"),
-    },
-  };
+  const program = initShaders(gl, VERTEX_SHADER, FRAGMENT_SHADER);
 
   var boxVertices = [
     // X, Y, Z           R, G, B
@@ -116,30 +109,24 @@ window.onload = function main() {
   var matViewUniformLocation = gl.getUniformLocation(program, "mView");
   var matProjUniformLocation = gl.getUniformLocation(program, "mProj");
 
-  var worldMatrix = Matrix.identity(4);
-  var viewMatrix = Matrix.lookAt([0, 0, -8], [0, 0, 0], [0, 1, 0]);
+  var worldMatrix = Matrix.identity(4).getFlattenMatrix();
+  var viewMatrix = Matrix.lookAt(
+    new Vector3(0, 0, -8),
+    new Vector3(0, 0, 0),
+    new Vector3(0, 1, 0)
+  ).getFlattenMatrix();
   var projMatrix = Matrix.perspective(
     toRadian(45),
-    canvas.clientWidth / canvas.clientHeight,
+    canvas.width / canvas.height,
     0.1,
     1000.0
-  );
+  ).getFlattenMatrix();
 
-  gl.uniformMatrix4fv(
-    matWorldUniformLocation,
-    gl.FALSE,
-    worldMatrix.getFlattenMatrix()
-  );
-  gl.uniformMatrix4fv(
-    matViewUniformLocation,
-    gl.FALSE,
-    viewMatrix.getFlattenMatrix()
-  );
-  gl.uniformMatrix4fv(
-    matProjUniformLocation,
-    gl.FALSE,
-    projMatrix.getFlattenMatrix()
-  );
+  gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
+  gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, viewMatrix);
+  gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, projMatrix);
+
+  var yRotationMatrix = new Float32Array(16);
 
   //
   // Main render loop
@@ -148,15 +135,22 @@ window.onload = function main() {
   var angle = 0;
   var loop = function () {
     angle = (performance.now() / 1000 / 6) * 2 * Math.PI;
-    const xRotationMatrix = Matrix.rotate(identityMatrix, angle / 4, [1, 0, 0]);
-    const yRotationMatrix = Matrix.rotate(identityMatrix, angle, [0, 1, 0]);
-
-    worldMatrix = Matrix.multiply(yRotationMatrix, xRotationMatrix);
-    gl.uniformMatrix4fv(
-      matWorldUniformLocation,
-      gl.FALSE,
-      worldMatrix.getFlattenMatrix()
+    const yRotationMatrix = Matrix.rotate(
+      identityMatrix,
+      angle,
+      new Vector3(0, 1, 0)
     );
+    const xRotationMatrix = Matrix.rotate(
+      identityMatrix,
+      angle / 4,
+      new Vector3(1, 0, 0)
+    );
+
+    worldMatrix = Matrix.multiply(
+      yRotationMatrix,
+      xRotationMatrix
+    ).getFlattenMatrix();
+    gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
 
     gl.clearColor(0.75, 0.85, 0.8, 1.0);
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);

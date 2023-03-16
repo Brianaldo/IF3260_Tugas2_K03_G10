@@ -49,6 +49,11 @@ class Vector3 {
     let length = Math.sqrt(
       vector.x * vector.x + vector.y * vector.y + vector.z * vector.z
     );
+
+    if (!length) {
+      return new Vector3(0, 0, 0);
+    }
+
     return new Vector3(vector.x / length, vector.y / length, vector.z / length);
   }
 
