@@ -1,66 +1,103 @@
-let normalize = false; // gaperlu dinormalisasi
-let stride = 0; // berapa banyak byte dari 1 set of values, kalo 0 berarti ngikutin numComponents dan Type
-let offset = 0; // offset untuk buffer
+// Draw the scene.
+function drawScene(gl, programInfo, buffers, vertexCount) {
+  gl.clearColor(0.23, 0.23, 0.23, 1.0);
+  gl.clearDepth(1.0);            
+  gl.enable(gl.DEPTH_TEST);          
+  gl.depthFunc(gl.LEQUAL);           
+  gl.viewport(0.0, 0.0, gl.canvas.clientWidth, gl.canvas.clientHeight);
 
-const setPositionAttribute = (gl, programInfo, vertices) => {
-  const numComponents = 2; // keluarin 2 value per iterasi
-  const type = gl.FLOAT;
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  const positionBuffer = initPositionBuffer(gl, vertices);
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  const fieldOfView = 45 * Math.PI / 180;   // in radians
+  const left = 0;
+  const top = 0;
+  const right = gl.canvas.clientWidth;
+  const bottom = gl.canvas.clientHeight;
+  const aspect = (right - left) / (bottom - top);
+  const zNear = 0.1;
+  const zFar = 1000.0;
+  var projectionMatrix = create();
+  const cameraAngleRadian = ((document.getElementById('cam-rotation').value  - 50.0) * Math.PI) / 25.0;
+  const projectionType = document.getElementById('perspectiveOption').value;
+  let radius = -((document.getElementById('cam-radius').value - 50.0) / 25.0) + 5.5;
 
-  gl.vertexAttribPointer(
-    programInfo.attribLocations.vertexPosition,
-    numComponents,
-    type,
-    normalize,
-    stride,
-    offset
-  );
-
-  gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
-};
-
-const setColorAttribute = (gl, programInfo, colors) => {
-  const numComponents = 4;
-  const type = gl.FLOAT;
-
-  const colorBuffer = initColorBuffer(gl, colors);
-  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-
-  gl.vertexAttribPointer(
-    programInfo.attribLocations.vertexColor,
-    numComponents,
-    type,
-    normalize,
-    stride,
-    offset
-  );
-
-  gl.enableVertexAttribArray(programInfo.attribLocations.vertexColor);
-};
-
-const drawObject = (gl, programInfo, vertices, mode, vertexCount) => {
-  let positions = [];
-  let colors = [];
-
-  if (Array.isArray(vertices)) {
-    for (let i = 0; i < vertices.length; i++) {
-      positions.push(vertices[i].position[0]);
-      positions.push(vertices[i].position[1]);
-      colors.push(vertices[i].color[0]);
-      colors.push(vertices[i].color[1]);
-      colors.push(vertices[i].color[2]);
-      colors.push(vertices[i].color[3]);
-    }
-  } else {
-    positions = vertices.position;
-    colors = vertices.color;
+  if (projectionType === "perspective") {
+    perspective(projectionMatrix,
+        fieldOfView,
+        aspect,
+        zNear,
+        zFar);
   }
 
-  setPositionAttribute(gl, programInfo, positions);
-  setColorAttribute(gl, programInfo, colors);
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  var modelViewMatrix = create();
+
+  translate(modelViewMatrix,
+  modelViewMatrix,     
+  [0.0, 0.0, -radius]);  
+  rotate(modelViewMatrix,      
+  modelViewMatrix,      
+  cameraAngleRadian,   
+  [0, 1, 0]);           
+
+  {
+    const numComponents = 3;
+    const type = gl.FLOAT;
+    const normalize = false;
+    const stride = 0;
+    const offset = 0;
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertices);
+    gl.vertexAttribPointer(
+        programInfo.attribLocations.vertexPosition,
+        numComponents,
+        type,
+        normalize,
+        stride,
+        offset);
+    gl.enableVertexAttribArray(
+        programInfo.attribLocations.vertexPosition);
+  }
+
+  // Tell WebGL how to pull out the colors from the color buffer
+  // into the vertexColor attribute.
+  {
+    const numComponents = 4;
+    const type = gl.FLOAT;
+    const normalize = false;
+    const stride = 0;
+    const offset = 0;
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colors);
+    gl.vertexAttribPointer(
+        programInfo.attribLocations.vertexColor,
+        numComponents,
+        type,
+        normalize,
+        stride,
+        offset);
+    gl.enableVertexAttribArray(
+        programInfo.attribLocations.vertexColor);
+  }
+
+  // Tell WebGL which indices to use to index the vertices
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
+
+  // Tell WebGL to use our program when drawing
+
   gl.useProgram(programInfo.program);
-  gl.drawArrays(mode, 0, vertexCount);
-};
+
+  // Set the shader uniforms
+
+  gl.uniformMatrix4fv(
+      programInfo.uniformLocations.projectionMatrix,
+      false,
+      projectionMatrix);
+  gl.uniformMatrix4fv(
+      programInfo.uniformLocations.modelViewMatrix,
+      false,
+      modelViewMatrix);
+
+  {
+    const type = gl.UNSIGNED_SHORT;
+    const offset = 0;
+    gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+  }
+}

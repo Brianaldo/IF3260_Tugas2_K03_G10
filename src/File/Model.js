@@ -3,8 +3,9 @@ class Model{
         type= "",
         vertices = [],
         vertexCount = 0,
+        angle = 0,
         indices = [],
-        faceColor = [[0.0, 1.0, 0.0, 1.0],
+        faceColors = [[0.0, 1.0, 0.0, 1.0],
                     [0.0, 1.0, 0.0, 1.0],
                     [0.0, 1.0, 0.0, 1.0],   
                     [0.0, 1.0, 0.0, 1.0]]   
@@ -13,7 +14,8 @@ class Model{
         this.vertices = vertices;
         this.indices = indices;
         this.vertexCount = vertexCount;
-        this.faceColor = faceColor;
+        this.faceColors = faceColors;
+        this.angle = angle;
     }
 
     checkVertex(x,y){
@@ -25,19 +27,25 @@ class Model{
     }
 
     rotation(x,y,z){
-
+        Matrix.rotate(this.vertices, this.angle, x, y,z);
     }
 
     scale(x,y,z){
-
+        Matrix.scale(this.vertices, x,y,z);
     }
 
     translation(x,y,z){
-
+        Matrix.translate(this.vertices,x,y,z);
     }
 
     projection(type){
+        if(type=="OBLQ"){
+            Matrix.oblique
+        }else if(type=="PRSPTV"){
 
+        }else{
+
+        }
     }
 
     RadiusCamera(value){

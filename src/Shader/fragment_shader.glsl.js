@@ -1,9 +1,6 @@
-const FRAGMENT_SHADER = `\
-precision mediump float;
-
-varying vec3 fragColor;
-
-void main()
-{
-  gl_FragColor = vec4(fragColor, 1.0);
-}`;
+const FRAGMENT_SHADER = `
+varying lowp vec4 vColor;
+void main(void) {
+  gl_FragColor = vColor;
+}
+`;

@@ -1,5 +1,27 @@
 var state;
 
+let objects_shaded = [];
+let objects_unshaded = [];
+
+const canvas = document.getElementById(`gl-canvas`);
+const gl = WebGLUtils.setupWebGL(canvas, {
+  preserveDrawingBuffer: true,
+});
+if (!gl) {
+  console.error("WebGL isn't available");
+  alert("WebGL isn't available");
+}
+
+canvas.width = innerHeight;
+canvas.height = innerHeight;
+
+gl.viewport(0, 0, canvas.width, canvas.height);
+gl.clearColor(0.75, 0.85, 0.8, 1.0);
+gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+gl.enable(gl.DEPTH_TEST);
+gl.frontFace(gl.CCW);
+gl.cullFace(gl.BACK);
+
 function defaultview(){
   state = {
     animation: true,
@@ -14,258 +36,275 @@ function animationidle(e){
 
 document.getElementById("idle").addEventListener("change", animationidle);
 
-window.onload = function main() {
-  const canvas = document.getElementById(`gl-canvas`);
-  const gl = WebGLUtils.setupWebGL(canvas, {
-    preserveDrawingBuffer: true,
-  });
-  if (!gl) {
-    console.error("WebGL isn't available");
-    alert("WebGL isn't available");
-  }
+function renderAllObjects(objects){
+  const shaderProgram = initShaders(gl, VERTEX_SHADER, FRAGMENT_SHADER);
 
-  canvas.width = innerHeight;
-  canvas.height = innerHeight;
-
-  gl.viewport(0, 0, canvas.width, canvas.height);
-  gl.clearColor(0.75, 0.85, 0.8, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  gl.enable(gl.DEPTH_TEST);
-  gl.enable(gl.CULL_FACE);
-  gl.frontFace(gl.CCW);
-  gl.cullFace(gl.BACK);
-
-  const program = initShaders(gl, VERTEX_SHADER, FRAGMENT_SHADER);
-
-  var boxVertices = [
-    // X, Y, Z           R, G, B
-    // Top
-    -1.0, 1.0, -1.0, 0.5, 0.5, 0.5, 
-    -1.0, 1.0, 1.0, 0.5, 0.5, 0.5, 
-    1.0, 1.0, 1.0, 0.5, 0.5, 0.5, 
-    1.0, 1.0, -1.0, 0.5, 0.5, 0.5,
-
-    // Left
-    -1.0, 1.0, 1.0, 0.75, 0.25, 0.5,
-    -1.0, -1.0, 1.0, 0.75, 0.25, 0.5,
-    -1.0, -1.0, -1.0, 0.75, 0.25, 0.5,
-    -1.0, 1.0, -1.0, 0.75, 0.25, 0.5,
-
-    // Right
-    1.0, 1.0, 1.0, 0.25, 0.25, 0.75,
-    1.0, -1.0, 1.0, 0.25, 0.25, 0.75,
-    1.0, -1.0, -1.0, 0.25, 0.25, 0.75,
-    1.0, 1.0, -1.0, 0.25, 0.25, 0.75,
-
-    // Front
-    1.0, 1.0, 1.0, 1.0, 0.0, 0.15,
-    1.0, -1.0, 1.0, 1.0, 0.0, 0.15,
-    -1.0, -1.0, 1.0, 1.0, 0.0, 0.15,
-    -1.0, 1.0, 1.0, 1.0, 0.0, 0.15,
-
-    // Back
-    1.0, 1.0, -1.0, 0.0, 1.0, 0.15, 
-    1.0, -1.0, -1.0, 0.0, 1.0, 0.15,
-    -1.0, -1.0, -1.0, 0.0, 1.0, 0.15,
-    -1.0, 1.0, -1.0, 0.0, 1.0, 0.15,
-
-    // Bottom
-    -1.0, -1.0, -1.0, 0.5, 0.5, 1.0,
-    -1.0, -1.0, 1.0, 0.5, 0.5, 1.0,
-    1.0, -1.0, 1.0, 0.5, 0.5, 1.0, 
-    1.0, -1.0, -1.0, 0.5, 0.5, 1.0,
-  ];
-
-  var boxIndices = [
-    // Top
-    0, 1, 2, 0, 2, 3,
-
-    // Left
-    5, 4, 6, 6, 4, 7,
-
-    // Right
-    8, 9, 10, 8, 10, 11,
-
-    // Front
-    13, 12, 14, 15, 14, 12,
-
-    // Back
-    16, 17, 18, 16, 18, 19,
-
-    // Bottom
-    21, 20, 22, 22, 20, 23,
-  ];
-
-  var boxVertexBufferObject = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, boxVertexBufferObject);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boxVertices), gl.STATIC_DRAW);
-
-  var boxIndexBufferObject = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, boxIndexBufferObject);
-  gl.bufferData(
-    gl.ELEMENT_ARRAY_BUFFER,
-    new Uint16Array(boxIndices),
-    gl.STATIC_DRAW
-  );
-
-  var positionAttribLocation = gl.getAttribLocation(program, "vertPosition");
-  var colorAttribLocation = gl.getAttribLocation(program, "vertColor");
-  gl.vertexAttribPointer(
-    positionAttribLocation, // Attribute location
-    3, // Number of elements per attribute
-    gl.FLOAT, // Type of elements
-    gl.FALSE,
-    6 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
-    0 // Offset from the beginning of a single vertex to this attribute
-  );
-  gl.vertexAttribPointer(
-    colorAttribLocation, // Attribute location
-    3, // Number of elements per attribute
-    gl.FLOAT, // Type of elements
-    gl.FALSE,
-    6 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
-    3 * Float32Array.BYTES_PER_ELEMENT // Offset from the beginning of a single vertex to this attribute
-  );
-
-  gl.enableVertexAttribArray(positionAttribLocation);
-  gl.enableVertexAttribArray(colorAttribLocation);
-
-  gl.useProgram(program);
-
-  var matWorldUniformLocation = gl.getUniformLocation(program, "mWorld");
-  var matViewUniformLocation = gl.getUniformLocation(program, "mView");
-  var matProjUniformLocation = gl.getUniformLocation(program, "mProj");
-
-  var worldMatrix = Matrix.identity(4).getFlattenMatrix();
-  var viewMatrix = Matrix.lookAt(
-    new Vector3(0, 0, -8),
-    new Vector3(0, 0, 0),
-    new Vector3(0, 1, 0)
-  ).getFlattenMatrix();
-  var projMatrix = Matrix.perspective(
-    toRadian(45),
-    canvas.width / canvas.height,
-    0.1,
-    1000.0
-  ).getFlattenMatrix();
-
-  gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
-  gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, viewMatrix);
-  gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, projMatrix);
-
-  var identityMatrix = Matrix.identity(4);
-  var angle = 0;
-
-  defaultview();
-  var loop = function () {
-    if(state.animation){
-      state.timeout++;
-      angle = (state.timeout)/300 * Math.PI;
+  // Collect all the info needed to use the shader program.
+  // Look up which attributes our shader program is using
+  // for aVertexPosition, aVevrtexColor and also
+  // look up uniform locations.
+  const programInfo = {
+    program: shaderProgram,
+    attribLocations: {
+      vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
+      vertexColor: gl.getAttribLocation(shaderProgram, 'aVertexColor'),
+    },
+    uniformLocations: {
+      projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
+      modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
     }
-    const yRotationMatrix = Matrix.rotate(
-      identityMatrix,
-      angle,
-      new Vector3(0, 1, 0)
-    );
-    const xRotationMatrix = Matrix.rotate(
-      identityMatrix,
-      angle / 4,
-      new Vector3(1, 0, 0)
-    );
-
-    worldMatrix = Matrix.multiply(
-      yRotationMatrix,
-      xRotationMatrix
-    ).getFlattenMatrix();
-    gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
-
-    gl.clearColor(0.75, 0.85, 0.8, 1.0);
-    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-    gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
-    requestAnimationFrame(loop);
   };
-  requestAnimationFrame(loop);
+
+  // Here's where we call the routine that builds all the
+  // objects we'll be drawing.
+  const buffers = initBuffer(gl, objects);
+
+  // Draw the scene repeatedly
+  function render() {
+    drawScene(gl, programInfo, buffers, objects.vertexCount);
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
+}
+
+function unshadeData(data) {
+  for (let i = 0; i < data.faceColors.length; i++) {
+      for (let j = 0; j < 3; j++) {
+          data.faceColors[i][j] = 0.5;
+      }
+  }
+  return data;
+}
+
+function changeToLoadFile(file) {
+  objects_shaded = JSON.parse(file);
+  objects_unshaded = unshadeData(JSON.parse(file));
+  renderAllObjects(objects_shaded);
+}
+
+const loadFile = () =>{
+    let selectedFile = document.getElementById("load-file").files;
+    if (selectedFile.length == 0) return;
+
+    const file = selectedFile[0]; 
+  
+    let reader = new FileReader();
+
+    reader.onload = (e) => changeToLoadFile(e.target.result);
+    reader.onerror = (e) => alert(e.target.error.name);
+  
+    reader.readAsText(file);
+}
+
+const clearCanvas = () => {
+  objects_shaded = [];
+  objects_unshaded = [];
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  renderAllObjects(objects_shaded);
 };
 
-// const renderObject = (obj) => {
-//   //load 1 object
-//   const method = obj.vertexCount == 2 ? gl.LINES : gl.TRIANGLE_FAN;
+const saveFile = (object = objects_shaded) => {
+  const fileName = document.getElementById(
+    Array.isArray(object) ? "filename" : "model-filename"
+  ).value;
 
-//   drawObject(gl, programInfo, obj.vertices, method, obj.vertexCount);
+  if (fileName == "") {
+    alert("Please input the output file name!");
+    return;
+  }
 
-//   obj.vertices.forEach((vertex) => {
-//     const point = getPoint(vertex.position[0], vertex.position[1]);
-//     drawObject(gl, programInfo, point, gl.TRIANGLE_FAN, 4);
+  const content = JSON.stringify(object);
+
+  const file = new Blob([content], {
+    type: "json/javascript",
+  });
+
+  const link = document.createElement("a");
+
+  link.href = URL.createObjectURL(file);
+  link.download = `${fileName}.json`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+};
+
+function handleClickShading() {
+  let checkBox = document.getElementById('shading');
+  if (checkBox.checked) {
+      renderAllObjects(objects_shaded);
+  } else {
+      renderAllObjects(objects_unshaded);
+  }
+}
+
+// window.onload = function main() {
+//   const canvas = document.getElementById(`gl-canvas`);
+//   const gl = WebGLUtils.setupWebGL(canvas, {
+//     preserveDrawingBuffer: true,
 //   });
-// };
-
-// const renderAllObjects = () => {
-//   gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-//   // render semua object
-//   objects.forEach((object) => {
-//     renderObject(object);
-//   });
-// };
-
-// const clearCanvas = () => {
-//   objects = [];
-//   gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-//   enableAllButtons();
-// };
-
-// const saveFile = (object = objects, union = false) => {
-//   const fileName = document.getElementById(
-//     Array.isArray(object) && !union ? "filename" : "model-filename"
-//   ).value;
-
-//   if (fileName == "") {
-//     alert("Please input the output file name!");
-//     return;
+//   if (!gl) {
+//     console.error("WebGL isn't available");
+//     alert("WebGL isn't available");
 //   }
 
-//   const content = JSON.stringify(object);
+//   canvas.width = innerHeight;
+//   canvas.height = innerHeight;
 
-//   const file = new Blob([content], {
-//     type: "json/javascript",
-//   });
+//   gl.viewport(0, 0, canvas.width, canvas.height);
+//   gl.clearColor(0.75, 0.85, 0.8, 1.0);
+//   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+//   gl.enable(gl.DEPTH_TEST);
+//   gl.enable(gl.CULL_FACE);
+//   gl.frontFace(gl.CCW);
+//   gl.cullFace(gl.BACK);
 
-//   const link = document.createElement("a");
+//   const program = initShaders(gl, VERTEX_SHADER, FRAGMENT_SHADER);
 
-//   link.href = URL.createObjectURL(file);
-//   link.download = `${fileName}.json`;
-//   link.click();
-//   URL.revokeObjectURL(link.href);
-// };
+//   var boxVertices = [
+//     // X, Y, Z           R, G, B
+//     // Top
+//     -1.0, 1.0, -1.0, 0.5, 0.5, 0.5, 
+//     -1.0, 1.0, 1.0, 0.5, 0.5, 0.5, 
+//     1.0, 1.0, 1.0, 0.5, 0.5, 0.5, 
+//     1.0, 1.0, -1.0, 0.5, 0.5, 0.5,
 
-// const loadFile = () => {
-//   const selectedFile = document.getElementById("load-file").files[0];
+//     // Left
+//     -1.0, 1.0, 1.0, 0.75, 0.25, 0.5,
+//     -1.0, -1.0, 1.0, 0.75, 0.25, 0.5,
+//     -1.0, -1.0, -1.0, 0.75, 0.25, 0.5,
+//     -1.0, 1.0, -1.0, 0.75, 0.25, 0.5,
 
-//   const reader = new FileReader();
+//     // Right
+//     1.0, 1.0, 1.0, 0.25, 0.25, 0.75,
+//     1.0, -1.0, 1.0, 0.25, 0.25, 0.75,
+//     1.0, -1.0, -1.0, 0.25, 0.25, 0.75,
+//     1.0, 1.0, -1.0, 0.25, 0.25, 0.75,
 
-//   reader.readAsText(selectedFile, "UTF-8");
+//     // Front
+//     1.0, 1.0, 1.0, 1.0, 0.0, 0.15,
+//     1.0, -1.0, 1.0, 1.0, 0.0, 0.15,
+//     -1.0, -1.0, 1.0, 1.0, 0.0, 0.15,
+//     -1.0, 1.0, 1.0, 1.0, 0.0, 0.15,
 
-//   reader.onload = (evt) => {
-//     let temp = JSON.parse(evt.target.result);
-//     temp = Array.isArray(temp) ? temp : [temp];
+//     // Back
+//     1.0, 1.0, -1.0, 0.0, 1.0, 0.15, 
+//     1.0, -1.0, -1.0, 0.0, 1.0, 0.15,
+//     -1.0, -1.0, -1.0, 0.0, 1.0, 0.15,
+//     -1.0, 1.0, -1.0, 0.0, 1.0, 0.15,
 
-//     let tempObjects = [];
+//     // Bottom
+//     -1.0, -1.0, -1.0, 0.5, 0.5, 1.0,
+//     -1.0, -1.0, 1.0, 0.5, 0.5, 1.0,
+//     1.0, -1.0, 1.0, 0.5, 0.5, 1.0, 
+//     1.0, -1.0, -1.0, 0.5, 0.5, 1.0,
+//   ];
 
-//     temp.forEach((item) => {
-//       let obj = new Model(
-//         item.type,
-//         item.vertices,
-//         item.vertexCount,
-//         item.indices,
-//         item.faceColor
-//       );
-//       tempObjects.push(obj);
-//     });
+//   var boxIndices = [
+//     // Top
+//     0, 1, 2, 0, 2, 3,
 
-//     objects = tempObjects;
-//     console.log(objects);
-//     renderAllObjects();
+//     // Left
+//     5, 4, 6, 6, 4, 7,
 
-//     alert("Successfully loaded file!");
-//     document.getElementById("load-file").value = "";
+//     // Right
+//     8, 9, 10, 8, 10, 11,
+
+//     // Front
+//     13, 12, 14, 15, 14, 12,
+
+//     // Back
+//     16, 17, 18, 16, 18, 19,
+
+//     // Bottom
+//     21, 20, 22, 22, 20, 23,
+//   ];
+
+//   var boxVertexBufferObject = gl.createBuffer();
+//   gl.bindBuffer(gl.ARRAY_BUFFER, boxVertexBufferObject);
+//   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boxVertices), gl.STATIC_DRAW);
+
+//   var boxIndexBufferObject = gl.createBuffer();
+//   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, boxIndexBufferObject);
+//   gl.bufferData(
+//     gl.ELEMENT_ARRAY_BUFFER,
+//     new Uint16Array(boxIndices),
+//     gl.STATIC_DRAW
+//   );
+
+//   var positionAttribLocation = gl.getAttribLocation(program, "vertPosition");
+//   var colorAttribLocation = gl.getAttribLocation(program, "vertColor");
+//   gl.vertexAttribPointer(
+//     positionAttribLocation, // Attribute location
+//     3, // Number of elements per attribute
+//     gl.FLOAT, // Type of elements
+//     gl.FALSE,
+//     6 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
+//     0 // Offset from the beginning of a single vertex to this attribute
+//   );
+//   gl.vertexAttribPointer(
+//     colorAttribLocation, // Attribute location
+//     3, // Number of elements per attribute
+//     gl.FLOAT, // Type of elements
+//     gl.FALSE,
+//     6 * Float32Array.BYTES_PER_ELEMENT, // Size of an individual vertex
+//     3 * Float32Array.BYTES_PER_ELEMENT // Offset from the beginning of a single vertex to this attribute
+//   );
+
+//   gl.enableVertexAttribArray(positionAttribLocation);
+//   gl.enableVertexAttribArray(colorAttribLocation);
+
+//   gl.useProgram(program);
+
+//   var matWorldUniformLocation = gl.getUniformLocation(program, "mWorld");
+//   var matViewUniformLocation = gl.getUniformLocation(program, "mView");
+//   var matProjUniformLocation = gl.getUniformLocation(program, "mProj");
+
+//   var worldMatrix = Matrix.identity(4).getFlattenMatrix();
+//   var viewMatrix = Matrix.lookAt(
+//     new Vector3(0, 0, -8),
+//     new Vector3(0, 0, 0),
+//     new Vector3(0, 1, 0)
+//   ).getFlattenMatrix();
+//   var projMatrix = Matrix.perspective(
+//     toRadian(45),
+//     canvas.width / canvas.height,
+//     0.1,
+//     1000.0
+//   ).getFlattenMatrix();
+
+//   gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
+//   gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, viewMatrix);
+//   gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, projMatrix);
+
+//   var identityMatrix = Matrix.identity(4);
+//   var angle = 0;
+
+//   defaultview();
+//   var loop = function () {
+//     if(state.animation){
+//       state.timeout++;
+//       angle = (state.timeout)/300 * Math.PI;
+//     }
+//     const yRotationMatrix = Matrix.rotate(
+//       identityMatrix,
+//       angle,
+//       new Vector3(0, 1, 0)
+//     );
+//     const xRotationMatrix = Matrix.rotate(
+//       identityMatrix,
+//       angle / 4,
+//       new Vector3(1, 0, 0)
+//     );
+
+//     worldMatrix = Matrix.multiply(
+//       yRotationMatrix,
+//       xRotationMatrix
+//     ).getFlattenMatrix();
+//     gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
+
+//     gl.clearColor(0.75, 0.85, 0.8, 1.0);
+//     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+//     gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
+//     requestAnimationFrame(loop);
 //   };
+//   requestAnimationFrame(loop);
 // };
