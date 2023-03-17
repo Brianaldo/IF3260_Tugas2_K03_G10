@@ -22,10 +22,23 @@ gl.enable(gl.DEPTH_TEST);
 gl.frontFace(gl.CCW);
 gl.cullFace(gl.BACK);
 
+const shaderProgram = initShaders(gl, VERTEX_SHADER, FRAGMENT_SHADER);
+const programInfo = {
+  program: shaderProgram,
+  attribLocations: {
+    vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
+    vertexColor: gl.getAttribLocation(shaderProgram, 'aVertexColor'),
+  },
+  uniformLocations: {
+    projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
+    modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
+  }
+};
+
 function defaultview(){
   state = {
     animation: true,
-    timeout: 0
+    timeout: 10
   }
 }
 
@@ -36,29 +49,29 @@ function animationidle(e){
 
 document.getElementById("idle").addEventListener("change", animationidle);
 
-function renderAllObjects(objects){
-  const shaderProgram = initShaders(gl, VERTEX_SHADER, FRAGMENT_SHADER);
-  const programInfo = {
-    program: shaderProgram,
-    attribLocations: {
-      vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
-      vertexColor: gl.getAttribLocation(shaderProgram, 'aVertexColor'),
-    },
-    uniformLocations: {
-      projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
-      modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
-    }
-  };
+var angleAnimation = -180;
+var incAngle = 0.5;
 
-  const buffers = initBuffer(gl, objects);
+const renderObject = (object)=>{
+  const buffers = initBuffer(gl, object);
   function render() {
-    drawObject(gl, programInfo, buffers, objects.vertexCount);
+    drawObject(gl, programInfo, buffers, object.vertexCount);
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);
 }
 
-function unshadeData(data) {
+const renderAllObjects = (objects)=>{
+  gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+  defaultview();
+  // render semua object
+  objects.forEach((object) => {
+    renderObject(object);
+  });
+  console.log(objects);
+}
+
+const unshadeData = (data) => {
   for (let i = 0; i < data.faceColors.length; i++) {
       for (let j = 0; j < 3; j++) {
           data.faceColors[i][j] = 0.5;
@@ -67,9 +80,9 @@ function unshadeData(data) {
   return data;
 }
 
-function changeToLoadFile(file) {
-  objects_shaded = JSON.parse(file);
-  objects_unshaded = unshadeData(JSON.parse(file));
+const changeToLoadFile=(file)=>{
+  objects_shaded.push(JSON.parse(file));
+  objects_unshaded.push(unshadeData(JSON.parse(file)));
   renderAllObjects(objects_shaded);
 }
 
@@ -90,7 +103,6 @@ const loadFile = () =>{
 const clearCanvas = () => {
   objects_shaded = [];
   objects_unshaded = [];
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   renderAllObjects(objects_shaded);
 };
 
@@ -118,7 +130,7 @@ const saveFile = (object = objects_shaded) => {
   URL.revokeObjectURL(link.href);
 };
 
-function handleClickShading() {
+const handleClickShading = () => {
   let checkBox = document.getElementById('shading');
   if (checkBox.checked) {
       renderAllObjects(objects_shaded);

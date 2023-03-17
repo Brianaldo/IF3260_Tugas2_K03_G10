@@ -32,6 +32,36 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
   var modelViewMatrix = Matrix.createIdentityMatrix();
   modelViewMatrix = Matrix.translate(modelViewMatrix,[0.0, 0.0, -radius]);  
   modelViewMatrix = Matrix.rotate(modelViewMatrix,cameraAngleRadian,[0, 1, 0]);           
+  
+  if(state.animation && state.timeout && angleAnimation<180){
+    modelViewMatrix = Matrix.rotate(modelViewMatrix,angleAnimation/100,[1,0,0]);
+    modelViewMatrix = Matrix.rotate(modelViewMatrix,angleAnimation/100,[0,1,0]);
+    angleAnimation += incAngle;
+    if(angleAnimation==180){
+      incAngle = -0.5;
+      angleAnimation += (2*incAngle);
+    }
+    if(angleAnimation==-180){
+      incAngle = 0.5;
+      angleAnimation += (2*incAngle);
+    }
+  }
+
+  const angleX = document.getElementById("rotasiX").value / 100;
+  const angleY = document.getElementById("rotasiY").value / 100;
+  const angleZ = document.getElementById("rotasiZ").value / 100;
+  const x = document.getElementById("translasiX").value / 100;
+  const y = document.getElementById("translasiY").value / 100;
+  const z = document.getElementById("translasiZ").value / 100;
+  const scalesX = document.getElementById("scalingX").value;
+  const scalesY = document.getElementById("scalingY").value;
+  const scalesZ = document.getElementById("scalingZ").value;
+
+  modelViewMatrix = Matrix.translate(modelViewMatrix,[z,y,x]);
+  modelViewMatrix = Matrix.rotate(modelViewMatrix,angleX,[1,0,0]);
+  modelViewMatrix = Matrix.rotate(modelViewMatrix,angleY,[0,1,0]);
+  modelViewMatrix = Matrix.rotate(modelViewMatrix,angleZ,[0,0,1]);
+  modelViewMatrix = Matrix.scale(modelViewMatrix,[scalesZ, scalesY, scalesX]); 
 
   {
     const numComponents = 3;
