@@ -38,11 +38,6 @@ document.getElementById("idle").addEventListener("change", animationidle);
 
 function renderAllObjects(objects){
   const shaderProgram = initShaders(gl, VERTEX_SHADER, FRAGMENT_SHADER);
-
-  // Collect all the info needed to use the shader program.
-  // Look up which attributes our shader program is using
-  // for aVertexPosition, aVevrtexColor and also
-  // look up uniform locations.
   const programInfo = {
     program: shaderProgram,
     attribLocations: {
@@ -55,13 +50,9 @@ function renderAllObjects(objects){
     }
   };
 
-  // Here's where we call the routine that builds all the
-  // objects we'll be drawing.
   const buffers = initBuffer(gl, objects);
-
-  // Draw the scene repeatedly
   function render() {
-    drawScene(gl, programInfo, buffers, objects.vertexCount);
+    drawObject(gl, programInfo, buffers, objects.vertexCount);
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);

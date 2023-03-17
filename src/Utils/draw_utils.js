@@ -1,5 +1,5 @@
 // Draw the scene.
-function drawScene(gl, programInfo, buffers, vertexCount) {
+function drawObject(gl, programInfo, buffers, vertexCount) {
   gl.clearColor(0.23, 0.23, 0.23, 1.0);
   gl.clearDepth(1.0);            
   gl.enable(gl.DEPTH_TEST);          
@@ -8,7 +8,7 @@ function drawScene(gl, programInfo, buffers, vertexCount) {
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  const fieldOfView = 45 * Math.PI / 180;   // in radians
+  const fieldOfView = 45 * Math.PI / 180;
   const left = 0;
   const top = 0;
   const right = gl.canvas.clientWidth;
@@ -16,28 +16,22 @@ function drawScene(gl, programInfo, buffers, vertexCount) {
   const aspect = (right - left) / (bottom - top);
   const zNear = 0.1;
   const zFar = 1000.0;
-  var projectionMatrix = create();
+  var projectionMatrix = Matrix.createIdentityMatrix();
   const cameraAngleRadian = ((document.getElementById('cam-rotation').value  - 50.0) * Math.PI) / 25.0;
   const projectionType = document.getElementById('perspectiveOption').value;
   let radius = -((document.getElementById('cam-radius').value - 50.0) / 25.0) + 5.5;
 
   if (projectionType === "perspective") {
-    perspective(projectionMatrix,
-        fieldOfView,
-        aspect,
-        zNear,
-        zFar);
+    projectionMatrix = Matrix.perspective(fieldOfView,aspect,zNear,zFar);
+  }else if(projectionType === "oblique"){
+    // Implement here
+  }else if(projectionType === "orthographic"){
+    // Implement here
   }
 
-  var modelViewMatrix = create();
-
-  translate(modelViewMatrix,
-  modelViewMatrix,     
-  [0.0, 0.0, -radius]);  
-  rotate(modelViewMatrix,      
-  modelViewMatrix,      
-  cameraAngleRadian,   
-  [0, 1, 0]);           
+  var modelViewMatrix = Matrix.createIdentityMatrix();
+  modelViewMatrix = Matrix.translate(modelViewMatrix,[0.0, 0.0, -radius]);  
+  modelViewMatrix = Matrix.rotate(modelViewMatrix,cameraAngleRadian,[0, 1, 0]);           
 
   {
     const numComponents = 3;
@@ -57,8 +51,6 @@ function drawScene(gl, programInfo, buffers, vertexCount) {
         programInfo.attribLocations.vertexPosition);
   }
 
-  // Tell WebGL how to pull out the colors from the color buffer
-  // into the vertexColor attribute.
   {
     const numComponents = 4;
     const type = gl.FLOAT;
@@ -77,15 +69,8 @@ function drawScene(gl, programInfo, buffers, vertexCount) {
         programInfo.attribLocations.vertexColor);
   }
 
-  // Tell WebGL which indices to use to index the vertices
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
-
-  // Tell WebGL to use our program when drawing
-
   gl.useProgram(programInfo.program);
-
-  // Set the shader uniforms
-
   gl.uniformMatrix4fv(
       programInfo.uniformLocations.projectionMatrix,
       false,

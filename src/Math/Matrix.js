@@ -161,164 +161,94 @@
 //     return new Matrix(matrix);
 //   }
 // }
-
-const create = () => {
-  let out = new Float32Array(16);
-  out[1] = 0;
-  out[2] = 0;
-  out[3] = 0;
-  out[4] = 0;
-  out[6] = 0;
-  out[7] = 0;
-  out[8] = 0;
-  out[9] = 0;
-  out[11] = 0;
-  out[12] = 0;
-  out[13] = 0;
-  out[14] = 0;
-  out[0] = 1;
-  out[5] = 1;
-  out[10] = 1;
-  out[15] = 1;
-  return out;
-}
-
-const translate = (out, a, v) => {
-  let x = v[0],
-      y = v[1],
-      z = v[2];
-  let a00, a01, a02, a03;
-  let a10, a11, a12, a13;
-  let a20, a21, a22, a23;
-  if (a === out) {
-      out[12] = a[0] * x + a[4] * y + a[8] * z + a[12];
-      out[13] = a[1] * x + a[5] * y + a[9] * z + a[13];
-      out[14] = a[2] * x + a[6] * y + a[10] * z + a[14];
-      out[15] = a[3] * x + a[7] * y + a[11] * z + a[15];
-  } else {
-      a00 = a[0];
-      a01 = a[1];
-      a02 = a[2];
-      a03 = a[3];
-      a10 = a[4];
-      a11 = a[5];
-      a12 = a[6];
-      a13 = a[7];
-      a20 = a[8];
-      a21 = a[9];
-      a22 = a[10];
-      a23 = a[11];
-      out[0] = a00;
-      out[1] = a01;
-      out[2] = a02;
-      out[3] = a03;
-      out[4] = a10;
-      out[5] = a11;
-      out[6] = a12;
-      out[7] = a13;
-      out[8] = a20;
-      out[9] = a21;
-      out[10] = a22;
-      out[11] = a23;
-      out[12] = a00 * x + a10 * y + a20 * z + a[12];
-      out[13] = a01 * x + a11 * y + a21 * z + a[13];
-      out[14] = a02 * x + a12 * y + a22 * z + a[14];
-      out[15] = a03 * x + a13 * y + a23 * z + a[15];
+class Matrix {
+  constructor(matrix){
+    this.matrix = matrix;
   }
-  return out;
-}
-
-const rotate = (out, a, rad, axis) => {
-  let x = axis[0],
-      y = axis[1],
-      z = axis[2];
-  let len = Math.hypot(x, y, z);
-  let s, c, t;
-  let a00, a01, a02, a03;
-  let a10, a11, a12, a13;
-  let a20, a21, a22, a23;
-  let b00, b01, b02;
-  let b10, b11, b12;
-  let b20, b21, b22;
-  if (len < 0.000001) {
-      return null;
+  static createIdentityMatrix(){
+    return [1,0,0,0,
+            0,1,0,0,
+            0,0,1,0,
+            0,0,0,1];
   }
-  len = 1 / len;
-  x *= len;
-  y *= len;
-  z *= len;
-  s = Math.sin(rad);
-  c = Math.cos(rad);
-  t = 1 - c;
-  a00 = a[0];
-  a01 = a[1];
-  a02 = a[2];
-  a03 = a[3];
-  a10 = a[4];
-  a11 = a[5];
-  a12 = a[6];
-  a13 = a[7];
-  a20 = a[8];
-  a21 = a[9];
-  a22 = a[10];
-  a23 = a[11];
-  // Construct the elements of the rotation matrix
-  b00 = x * x * t + c;
-  b01 = y * x * t + z * s;
-  b02 = z * x * t - y * s;
-  b10 = x * y * t - z * s;
-  b11 = y * y * t + c;
-  b12 = z * y * t + x * s;
-  b20 = x * z * t + y * s;
-  b21 = y * z * t - x * s;
-  b22 = z * z * t + c;
-  // Perform rotation-specific matrix multiplication
-  out[0] = a00 * b00 + a10 * b01 + a20 * b02;
-  out[1] = a01 * b00 + a11 * b01 + a21 * b02;
-  out[2] = a02 * b00 + a12 * b01 + a22 * b02;
-  out[3] = a03 * b00 + a13 * b01 + a23 * b02;
-  out[4] = a00 * b10 + a10 * b11 + a20 * b12;
-  out[5] = a01 * b10 + a11 * b11 + a21 * b12;
-  out[6] = a02 * b10 + a12 * b11 + a22 * b12;
-  out[7] = a03 * b10 + a13 * b11 + a23 * b12;
-  out[8] = a00 * b20 + a10 * b21 + a20 * b22;
-  out[9] = a01 * b20 + a11 * b21 + a21 * b22;
-  out[10] = a02 * b20 + a12 * b21 + a22 * b22;
-  out[11] = a03 * b20 + a13 * b21 + a23 * b22;
-  if (a !== out) {
-      // If the source and destination differ, copy the unchanged last row
-      out[12] = a[12];
-      out[13] = a[13];
-      out[14] = a[14];
-      out[15] = a[15];
+  
+  static transpose(matrix){
+    return [matrix[0],matrix[4],matrix[8],matrix[12],
+            matrix[1],matrix[5],matrix[9],matrix[13],
+            matrix[2],matrix[6],matrix[10],matrix[14],
+            matrix[3],matrix[7],matrix[11],matrix[15]];
   }
-  return out;
-}
-
-const perspective = (out, fovy, aspect, near, far) => {
-  let f = 1.0 / Math.tan(fovy / 2),
-      nf;
-  out[0] = f / aspect;
-  out[1] = 0;
-  out[2] = 0;
-  out[3] = 0;
-  out[4] = 0;
-  out[5] = f;
-  out[6] = 0;
-  out[7] = 0;
-  out[8] = 0;
-  out[9] = 0;
-  out[11] = -1;
-  out[12] = 0;
-  out[13] = 0;
-  out[15] = 0;
-  if (far != null && far !== Infinity) {
-      nf = 1 / (near - far);
-      out[10] = (far + near) * nf;
-      out[14] = 2 * far * near * nf;
-  } else {
-      out[10] = -1;
-      out[14] = -2 * near;
+  
+  static translate(matrix,transVal){
+    var moved12 = matrix[12]+(matrix[0]*transVal[0] + matrix[4]*transVal[1] + matrix[8]*transVal[2]);
+    var moved13 = matrix[13]+(matrix[1]*transVal[0] + matrix[5]*transVal[1] + matrix[9]*transVal[2]);
+    var moved14 = matrix[14]+(matrix[2]*transVal[0] + matrix[6]*transVal[1] + matrix[10]*transVal[2]);
+    var moved15 = matrix[15]+(matrix[3]*transVal[0] + matrix[7]*transVal[1] + matrix[11]*transVal[2]);
+    return [matrix[0],matrix[1],matrix[2],matrix[3],
+            matrix[4],matrix[5],matrix[6],matrix[7],
+            matrix[8],matrix[9],matrix[10],matrix[11],
+            moved12,moved13,moved14,moved15];
   }
-  return out;
+  
+  static rotate(matrix, rad, axis){
+    let length = Math.hypot(axis[0],axis[1],axis[2]);
+    if(length<0.000001) return null;
+    let coorX = axis[0]/length,coorY=axis[1]/length,coorZ=axis[2]/length;
+    let s = Math.sin(rad);
+    let c = Math.cos(rad);
+    let t = 1-c;
+    let b00 = coorX * coorX * t + c;
+    let b01 = coorY * coorX * t + coorZ * s;
+    let b02 = coorZ * coorX * t - coorY * s;
+    let b10 = coorX * coorY * t - coorZ * s;
+    let b11 = coorY * coorY * t + c;
+    let b12 = coorZ * coorY * t + coorX * s;
+    let b20 = coorX * coorZ * t + coorY * s;
+    let b21 = coorY * coorZ * t - coorX * s;
+    let b22 = coorZ * coorZ * t + c;
+    return [ matrix[0] * b00 + matrix[4] * b01 + matrix[8] * b02, 
+             matrix[1] * b00 + matrix[5] * b01 + matrix[9] * b02,
+             matrix[2] * b00 + matrix[6] * b01 + matrix[10] * b02,
+             matrix[3] * b00 + matrix[7] * b01 + matrix[11] * b02,
+             matrix[0] * b10 + matrix[4] * b11 + matrix[8] * b12, 
+             matrix[1] * b10 + matrix[5] * b11 + matrix[9] * b12,
+             matrix[2] * b10 + matrix[6] * b11 + matrix[10] * b12,
+             matrix[3] * b10 + matrix[7] * b11 + matrix[11] * b12,
+             matrix[0] * b20 + matrix[4] * b21 + matrix[8] * b22, 
+             matrix[1] * b20 + matrix[5] * b21 + matrix[9] * b22,
+             matrix[2] * b20 + matrix[6] * b21 + matrix[10] * b22,
+             matrix[3] * b20 + matrix[7] * b21 + matrix[11] * b22,
+             matrix[12],matrix[13],matrix[14],matrix[15]];
+  }
+  
+  static scale(matrix, scale){
+    return [ matrix[0]*scale[0],matrix[1]*scale[0],matrix[2]*scale[0],matrix[3]*scale[0],
+             matrix[4]*scale[1],matrix[5]*scale[1],matrix[6]*scale[1],matrix[7]*scale[1],
+             matrix[8]*scale[2],matrix[9]*scale[2],matrix[10]*scale[2],matrix[11]*scale[2],
+             matrix[12],matrix[13],matrix[14],matrix[15]];
+  }
+  
+  static perspective(fovy, aspect, near, far){
+    let f = 1.0 / Math.tan(fovy / 2), nf = 1 / (near - far);
+    let matrix = [f / aspect, 0, 0, 0,
+                  0, f, 0, 0,
+                  0, 0, (far + near) * nf, -1,
+                  0, 0, 2 * far * near * nf, 0];
+    if (far==null||far==Infinity){
+        matrix[10] = -1;
+        matrix[14] = -2 * near;
+    }
+    return matrix;
+  }
+  
+  static oblique(theta, phi){
+    var cotT = -1 / Math.tan(toRadian(theta));
+    var cotP = -1 / Math.tan(toRadian(phi));
+    let matrix = [1, 0, cotT, 0,
+                  0, 1, cotP, 0,
+                  0, 0, 1, 0,
+                  0, 0, 0, 1];
+    matrix = Matrix.transpose(matrix);
+    return matrix;
+  }
 }
