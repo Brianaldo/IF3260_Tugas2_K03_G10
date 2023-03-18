@@ -1,5 +1,5 @@
 function initBuffer(gl, data){
-    const { vertices, indices, faceColors} = data;
+    const { vertices, indices, faceColors } = data;
     // Buat verticesnya
     const verticesBuffer = gl.createBuffer();
 
@@ -10,9 +10,7 @@ function initBuffer(gl, data){
     // Buat index
     const indexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,
-    new Uint16Array(indices), gl.STATIC_DRAW);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(indices), gl.STATIC_DRAW);
 
     // Buat colors
     let colors = [];

@@ -33,21 +33,26 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
   modelViewMatrix = Matrix.translate(modelViewMatrix,[0.0, 0.0, -radius]);  
   modelViewMatrix = Matrix.rotate(modelViewMatrix,cameraAngleRadian,[0, 1, 0]);           
   
-  console.log(numRender);
-  if(state.animation && state.timeout && angleAnimation<180){
-    modelViewMatrix = Matrix.rotate(modelViewMatrix,angleAnimation/100,[1,0,0]);
-    modelViewMatrix = Matrix.rotate(modelViewMatrix,angleAnimation/100,[0,1,0]);
-    if(angleAnimation + incAngle/numRender >=180){
-      incAngle = -0.5;
-      angleAnimation += (2*incAngle/numRender);
-    }else if(angleAnimation + incAngle/numRender <=-180){
-      incAngle = 0.5;
-      angleAnimation += (2*incAngle/numRender);
-    }else{
-      angleAnimation += (incAngle/numRender);
+  if(resetDefault==0){
+    if(state.animation && state.timeout && angleAnimation<180){
+      modelViewMatrix = Matrix.rotate(modelViewMatrix,angleAnimation/100,[1,0,0]);
+      modelViewMatrix = Matrix.rotate(modelViewMatrix,angleAnimation/100,[0,1,0]);
+      if(angleAnimation + incAngle/numRender >=180){
+        incAngle = -0.5;
+        angleAnimation += (incAngle/numRender);
+      }else if(angleAnimation + incAngle/numRender <=-180){
+        incAngle = 0.5;
+        angleAnimation += (incAngle/numRender);
+      }else{
+        angleAnimation += (incAngle/numRender);
+      }
+    }
+    else{
+      modelViewMatrix = Matrix.rotate(modelViewMatrix,angleAnimation/100,[1,0,0]);
+      modelViewMatrix = Matrix.rotate(modelViewMatrix,angleAnimation/100,[0,1,0]);
     }
   }
-
+  
   const angleX = document.getElementById("rotasiX").value / 100;
   const angleY = document.getElementById("rotasiY").value / 100;
   const angleZ = document.getElementById("rotasiZ").value / 100;
@@ -101,14 +106,8 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
 
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
   gl.useProgram(programInfo.program);
-  gl.uniformMatrix4fv(
-      programInfo.uniformLocations.projectionMatrix,
-      false,
-      projectionMatrix);
-  gl.uniformMatrix4fv(
-      programInfo.uniformLocations.modelViewMatrix,
-      false,
-      modelViewMatrix);
+  gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix,false,projectionMatrix);
+  gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix,false,modelViewMatrix);
 
   {
     const type = gl.UNSIGNED_SHORT;

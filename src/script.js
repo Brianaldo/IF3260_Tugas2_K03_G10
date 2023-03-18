@@ -46,14 +46,15 @@ function defaultview(){
 
 function animationidle(e){
   state.animation = document.getElementById("idle").checked;
-  console.log(state.animation);
+  resetDefault = 0;
 }
 
 document.getElementById("idle").addEventListener("change", animationidle);
 defaultview();
-var angleAnimation = -180;
+var angleAnimation = 0;
 var incAngle = 0.5;
-var numRender = 1;
+var numRender = 0;
+var resetDefault = 1;
 
 const renderObject = (object)=>{
   const buffers = initBuffer(gl, object);
@@ -70,23 +71,23 @@ const renderAllObjects = (objects)=>{
   objects.forEach((object) => {
     renderObject(object);
   });
-  console.log(objects);
+  numRender++;
 }
 
 const unshadeData = (data) => {
   for (let i = 0; i < data.faceColors.length; i++) {
       for (let j = 0; j < 3; j++) {
-          data.faceColors[i][j] = 0.0;
+        data.faceColors[i][j] = 0.0;
       }
   }
   return data;
 }
 
 const changeToLoadFile=(file)=>{
+  resetDefault = 1;
   objects_shaded.push(JSON.parse(file));
   objects_unshaded.push(unshadeData(JSON.parse(file)));
   renderAllObjects(objects_shaded);
-  numRender++;
 }
 
 const loadFile = () =>{
@@ -96,7 +97,7 @@ const loadFile = () =>{
     const file = selectedFile[0]; 
   
     let reader = new FileReader();
-
+    
     reader.onload = (e) => changeToLoadFile(e.target.result);
     reader.onerror = (e) => alert(e.target.error.name);
   
@@ -107,7 +108,7 @@ const clearCanvas = () => {
   objects_shaded = [];
   objects_unshaded = [];
   renderAllObjects(objects_shaded);
-  numRender++;
+  resetDefault = 0;
 };
 
 const saveFile = (object = objects_shaded) => {
@@ -142,13 +143,15 @@ const resetToDefaultView = () => {
   document.getElementById("translasiZ").value = 0;
   document.getElementById("rotasiX").value = 0;
   document.getElementById("rotasiY").value = 0;
-  document.getElementById("rotasiZ").value = 30;
+  document.getElementById("rotasiZ").value = 0;
   document.getElementById("scalingX").value = 1;
   document.getElementById("scalingY").value = 1;
   document.getElementById("scalingZ").value = 1;
   document.getElementById('cam-rotation').value = 60;
   document.getElementById('cam-radius').value = 0;
   document.getElementById('shading').checked = true;
+  resetDefault = 1;
+  angleAnimation = 0;
   renderAllObjects(objects_shaded);
 }
 
@@ -159,7 +162,7 @@ const handleClickShading = () => {
   } else {
       renderAllObjects(objects_unshaded);
   }
-  numRender++;
+  resetDefault = 0;
 }
 
 // window.onload = function main() {
