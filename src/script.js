@@ -50,6 +50,7 @@ function animationidle(e){
 }
 
 document.getElementById("idle").addEventListener("change", animationidle);
+defaultview();
 var angleAnimation = -180;
 var incAngle = 0.5;
 var numRender = 1;
@@ -65,7 +66,6 @@ const renderObject = (object)=>{
 
 const renderAllObjects = (objects)=>{
   gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-  defaultview();
   // render semua object
   objects.forEach((object) => {
     renderObject(object);
@@ -76,7 +76,7 @@ const renderAllObjects = (objects)=>{
 const unshadeData = (data) => {
   for (let i = 0; i < data.faceColors.length; i++) {
       for (let j = 0; j < 3; j++) {
-          data.faceColors[i][j] = 0.5;
+          data.faceColors[i][j] = 0.0;
       }
   }
   return data;
@@ -143,11 +143,12 @@ const resetToDefaultView = () => {
   document.getElementById("rotasiX").value = 0;
   document.getElementById("rotasiY").value = 0;
   document.getElementById("rotasiZ").value = 30;
-  document.getElementById("scallingX").value = 1;
-  document.getElementById("scallingY").value = 1;
-  document.getElementById("scallingZ").value = 1;
+  document.getElementById("scalingX").value = 1;
+  document.getElementById("scalingY").value = 1;
+  document.getElementById("scalingZ").value = 1;
   document.getElementById('cam-rotation').value = 60;
   document.getElementById('cam-radius').value = 0;
+  document.getElementById('shading').checked = true;
   renderAllObjects(objects_shaded);
 }
 
