@@ -7,6 +7,7 @@ const canvas = document.getElementById(`gl-canvas`);
 const gl = WebGLUtils.setupWebGL(canvas, {
   preserveDrawingBuffer: true,
 });
+
 if (!gl) {
   console.error("WebGL isn't available");
   alert("WebGL isn't available");
@@ -37,9 +38,10 @@ const programInfo = {
 
 function defaultview(){
   state = {
-    animation: true,
+    animation: false,
     timeout: 10
   }
+  document.getElementById("idle").checked = false;
 }
 
 function animationidle(e){
@@ -48,8 +50,6 @@ function animationidle(e){
 }
 
 document.getElementById("idle").addEventListener("change", animationidle);
-defaultview();
-
 var angleAnimation = -180;
 var incAngle = 0.5;
 var numRender = 1;
@@ -65,6 +65,7 @@ const renderObject = (object)=>{
 
 const renderAllObjects = (objects)=>{
   gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+  defaultview();
   // render semua object
   objects.forEach((object) => {
     renderObject(object);
@@ -132,6 +133,23 @@ const saveFile = (object = objects_shaded) => {
   link.click();
   URL.revokeObjectURL(link.href);
 };
+
+const resetToDefaultView = () => {
+  defaultview();
+  document.getElementById('perspectiveOption').value = 'perspective';
+  document.getElementById("translasiX").value = 0;
+  document.getElementById("translasiY").value = 0;
+  document.getElementById("translasiZ").value = 0;
+  document.getElementById("rotasiX").value = 0;
+  document.getElementById("rotasiY").value = 0;
+  document.getElementById("rotasiZ").value = 30;
+  document.getElementById("scallingX").value = 1;
+  document.getElementById("scallingY").value = 1;
+  document.getElementById("scallingZ").value = 1;
+  document.getElementById('cam-rotation').value = 60;
+  document.getElementById('cam-radius').value = 0;
+  renderAllObjects(objects_shaded);
+}
 
 const handleClickShading = () => {
   let checkBox = document.getElementById('shading');

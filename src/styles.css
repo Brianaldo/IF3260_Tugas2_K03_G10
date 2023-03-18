@@ -82,6 +82,19 @@ input[type="number"] {
   display: inline-block;
 }
 
+#reset-view {
+  text-align: center;
+  border-radius: 10px;
+  border: 2px solid rgb(0, 189, 50);
+  color: rgb(0, 189, 63);
+  background-color: rgba(100, 100, 100, 0);
+  padding: 8.45px 1.4vw;
+  font-size: 16px;
+  font-family: "Quicksand";
+  margin: 6px;
+  display: block;
+}
+
 #clear-canvas {
   text-align: center;
   border-radius: 10px;
@@ -118,6 +131,10 @@ input[type="number"] {
 }
 
 .file-button:hover, #clear-canvas:hover {
+  background-color: white;
+}
+
+.file-button:hover, #reset-view:hover {
   background-color: white;
 }
 

@@ -32,6 +32,7 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
   var modelViewMatrix = Matrix.createIdentityMatrix();
   modelViewMatrix = Matrix.translate(modelViewMatrix,[0.0, 0.0, -radius]);  
   modelViewMatrix = Matrix.rotate(modelViewMatrix,cameraAngleRadian,[0, 1, 0]);           
+  
   console.log(numRender);
   if(state.animation && state.timeout && angleAnimation<180){
     modelViewMatrix = Matrix.rotate(modelViewMatrix,angleAnimation/100,[1,0,0]);
