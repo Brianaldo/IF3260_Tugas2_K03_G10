@@ -48,9 +48,11 @@ function animationidle(e){
 }
 
 document.getElementById("idle").addEventListener("change", animationidle);
+defaultview();
 
 var angleAnimation = -180;
 var incAngle = 0.5;
+var numRender = 1;
 
 const renderObject = (object)=>{
   const buffers = initBuffer(gl, object);
@@ -63,7 +65,6 @@ const renderObject = (object)=>{
 
 const renderAllObjects = (objects)=>{
   gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-  defaultview();
   // render semua object
   objects.forEach((object) => {
     renderObject(object);
@@ -84,6 +85,7 @@ const changeToLoadFile=(file)=>{
   objects_shaded.push(JSON.parse(file));
   objects_unshaded.push(unshadeData(JSON.parse(file)));
   renderAllObjects(objects_shaded);
+  numRender++;
 }
 
 const loadFile = () =>{
@@ -104,6 +106,7 @@ const clearCanvas = () => {
   objects_shaded = [];
   objects_unshaded = [];
   renderAllObjects(objects_shaded);
+  numRender++;
 };
 
 const saveFile = (object = objects_shaded) => {
@@ -137,6 +140,7 @@ const handleClickShading = () => {
   } else {
       renderAllObjects(objects_unshaded);
   }
+  numRender++;
 }
 
 // window.onload = function main() {

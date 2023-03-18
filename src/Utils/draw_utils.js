@@ -32,18 +32,18 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
   var modelViewMatrix = Matrix.createIdentityMatrix();
   modelViewMatrix = Matrix.translate(modelViewMatrix,[0.0, 0.0, -radius]);  
   modelViewMatrix = Matrix.rotate(modelViewMatrix,cameraAngleRadian,[0, 1, 0]);           
-  
+  console.log(numRender);
   if(state.animation && state.timeout && angleAnimation<180){
     modelViewMatrix = Matrix.rotate(modelViewMatrix,angleAnimation/100,[1,0,0]);
     modelViewMatrix = Matrix.rotate(modelViewMatrix,angleAnimation/100,[0,1,0]);
-    angleAnimation += incAngle;
-    if(angleAnimation==180){
+    if(angleAnimation + incAngle/numRender >=180){
       incAngle = -0.5;
-      angleAnimation += (2*incAngle);
-    }
-    if(angleAnimation==-180){
+      angleAnimation += (2*incAngle/numRender);
+    }else if(angleAnimation + incAngle/numRender <=-180){
       incAngle = 0.5;
-      angleAnimation += (2*incAngle);
+      angleAnimation += (2*incAngle/numRender);
+    }else{
+      angleAnimation += (incAngle/numRender);
     }
   }
 
@@ -62,7 +62,6 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
   modelViewMatrix = Matrix.rotate(modelViewMatrix,angleY,[0,1,0]);
   modelViewMatrix = Matrix.rotate(modelViewMatrix,angleZ,[0,0,1]);
   modelViewMatrix = Matrix.scale(modelViewMatrix,[scalesZ, scalesY, scalesX]); 
-
   {
     const numComponents = 3;
     const type = gl.FLOAT;
