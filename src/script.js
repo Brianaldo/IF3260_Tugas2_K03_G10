@@ -135,6 +135,20 @@ const saveFile = (object = objects_shaded) => {
   URL.revokeObjectURL(link.href);
 };
 
+function updateOutput() {
+  document.getElementById("output-rot-x").value = 0;
+  document.getElementById("output-rot-y").value = 0;
+  document.getElementById("output-rot-z").value = 0;
+  document.getElementById("output-trans-x").value = 0;
+  document.getElementById("output-trans-y").value = 0;
+  document.getElementById("output-trans-z").value = 0;
+  document.getElementById("output-scale-x").value = 1;
+  document.getElementById("output-scale-y").value = 1;
+  document.getElementById("output-scale-z").value = 1;
+  document.getElementById("output-cam-rad").value = 0;
+  document.getElementById("output-range").value = 60;
+}
+
 const resetToDefaultView = () => {
   defaultview();
   document.getElementById('perspectiveOption').value = 'perspective';
@@ -143,6 +157,7 @@ const resetToDefaultView = () => {
   document.getElementById("translasiZ").value = 0;
   document.getElementById("rotasiX").value = 0;
   document.getElementById("rotasiY").value = 0;
+  document.querySelector("output").value = 0;
   document.getElementById("rotasiZ").value = 0;
   document.getElementById("scalingX").value = 1;
   document.getElementById("scalingY").value = 1;
@@ -150,6 +165,7 @@ const resetToDefaultView = () => {
   document.getElementById('cam-rotation').value = 60;
   document.getElementById('cam-radius').value = 0;
   document.getElementById('shading').checked = true;
+  updateOutput();
   resetDefault = 1;
   angleAnimation = 0;
   renderAllObjects(objects_shaded);
