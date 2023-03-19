@@ -1,13 +1,10 @@
 // Draw the scene.
-function drawObject(gl, programInfo, buffers, vertexCount) {
-  gl.clearColor(0.23, 0.23, 0.23, 1.0);
-  gl.clearDepth(1.0);            
+function drawObject(gl, programInfo, buffers, vertexCount) {  
   gl.enable(gl.DEPTH_TEST);          
   gl.depthFunc(gl.LEQUAL);           
   gl.viewport(0.0, 0.0, gl.canvas.clientWidth, gl.canvas.clientHeight);
-
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
+  if(isClearCanvas==true) return;
   const fieldOfView = 45 * Math.PI / 180;
   const left = 0;
   const top = 0;

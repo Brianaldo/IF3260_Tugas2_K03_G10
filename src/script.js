@@ -1,7 +1,6 @@
 var state;
 
 let objects_shaded = [];
-let objects_unshaded = [];
 
 const canvas = document.getElementById(`gl-canvas`);
 const gl = WebGLUtils.setupWebGL(canvas, {
@@ -17,24 +16,12 @@ canvas.width = innerHeight;
 canvas.height = innerHeight;
 
 gl.viewport(0, 0, canvas.width, canvas.height);
-gl.clearColor(0.75, 0.85, 0.8, 1.0);
+// gl.clearColor(0.75, 0.85, 0.8, 1.0);
+gl.clearColor(0.0, 0.0, 0.0, 0.76);
 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 gl.enable(gl.DEPTH_TEST);
 gl.frontFace(gl.CCW);
 gl.cullFace(gl.BACK);
-
-const shaderProgram = initShaders(gl, VERTEX_SHADER, FRAGMENT_SHADER);
-const programInfo = {
-  program: shaderProgram,
-  attribLocations: {
-    vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
-    vertexColor: gl.getAttribLocation(shaderProgram, 'aVertexColor'),
-  },
-  uniformLocations: {
-    projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
-    modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
-  }
-};
 
 function defaultview(){
   state = {
@@ -55,14 +42,29 @@ var angleAnimation = 0;
 var incAngle = 0.5;
 var numRender = 0;
 var resetDefault = 1;
+var isClearCanvas = false;
+var shadingFragment = FRAGMENT_SHADER_LIGHT;
 
 const renderObject = (object)=>{
+  const shaderProgram = initShaders(gl, VERTEX_SHADER);
+  const programInfo = {
+    program: shaderProgram,
+    attribLocations: {
+      vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
+      vertexColor: gl.getAttribLocation(shaderProgram, 'aVertexColor'),
+    },
+    uniformLocations: {
+      projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
+      modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
+    }
+  };
   const buffers = initBuffer(gl, object);
   function render() {
     drawObject(gl, programInfo, buffers, object.vertexCount);
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);
+  numRender++;
 }
 
 const renderAllObjects = (objects)=>{
@@ -71,44 +73,36 @@ const renderAllObjects = (objects)=>{
   objects.forEach((object) => {
     renderObject(object);
   });
-  numRender++;
-}
-
-const unshadeData = (data) => {
-  for (let i = 0; i < data.faceColors.length; i++) {
-      for (let j = 0; j < 3; j++) {
-        data.faceColors[i][j] = 0.0;
-      }
-  }
-  return data;
 }
 
 const changeToLoadFile=(file)=>{
   resetDefault = 1;
   objects_shaded.push(JSON.parse(file));
-  objects_unshaded.push(unshadeData(JSON.parse(file)));
   renderAllObjects(objects_shaded);
 }
 
 const loadFile = () =>{
-    let selectedFile = document.getElementById("load-file").files;
-    if (selectedFile.length == 0) return;
+  let selectedFile = document.getElementById("load-file").files;
+  console.log("Ini di load file");
+  resetConf();
+  if (selectedFile.length == 0) return;
 
-    const file = selectedFile[0]; 
+  const file = selectedFile[0]; 
+
+  let reader = new FileReader();
   
-    let reader = new FileReader();
-    
-    reader.onload = (e) => changeToLoadFile(e.target.result);
-    reader.onerror = (e) => alert(e.target.error.name);
-  
-    reader.readAsText(file);
+  reader.onload = (e) => changeToLoadFile(e.target.result);
+  reader.onerror = (e) => alert(e.target.error.name);
+
+  reader.readAsText(file);
 }
 
 const clearCanvas = () => {
+  isClearCanvas = true;
+  console.log("Ini clear");
   objects_shaded = [];
-  objects_unshaded = [];
-  renderAllObjects(objects_shaded);
-  resetDefault = 0;
+  resetConf();
+  // renderAllObjects(objects_shaded);
 };
 
 const saveFile = (object = objects_shaded) => {
@@ -135,7 +129,7 @@ const saveFile = (object = objects_shaded) => {
   URL.revokeObjectURL(link.href);
 };
 
-const resetToDefaultView = () => {
+const resetConf = () =>{
   defaultview();
   document.getElementById('perspectiveOption').value = 'perspective';
   document.getElementById("translasiX").value = 0;
@@ -150,18 +144,25 @@ const resetToDefaultView = () => {
   document.getElementById('cam-rotation').value = 60;
   document.getElementById('cam-radius').value = 0;
   document.getElementById('shading').checked = true;
+  shadingFragment = FRAGMENT_SHADER_LIGHT;
   resetDefault = 1;
   angleAnimation = 0;
+  incAngle = 0.5;
+}
+
+const resetToDefaultView = () => {
+  resetConf();
   renderAllObjects(objects_shaded);
 }
 
 const handleClickShading = () => {
   let checkBox = document.getElementById('shading');
   if (checkBox.checked) {
-      renderAllObjects(objects_shaded);
+      shadingFragment = FRAGMENT_SHADER_LIGHT;
   } else {
-      renderAllObjects(objects_unshaded);
+      shadingFragment = FRAGMENT_SHADER_FLAT;
   }
+  renderAllObjects(objects_shaded);
   resetDefault = 0;
 }
 

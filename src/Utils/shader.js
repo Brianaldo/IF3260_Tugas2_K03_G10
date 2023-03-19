@@ -14,9 +14,11 @@ function loadShader(gl, type, source) {
   return shader;
 }
 
-function initShaders(gl, vsSource = VERTEX_SHADER, fsSource = FRAGMENT_SHADER) {
+function initShaders(gl, vsSource = VERTEX_SHADER) {
   const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
-  const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+  var fragmentShader = null;
+  if(shadingFragment==FRAGMENT_SHADER_LIGHT) fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, FRAGMENT_SHADER_LIGHT);
+  else fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, FRAGMENT_SHADER_FLAT);
 
   const shaderProgram = gl.createProgram();
 
