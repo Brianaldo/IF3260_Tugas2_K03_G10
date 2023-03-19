@@ -14,8 +14,9 @@ function initBuffer(gl, data){
 
     // Buat colors
     let colors = [];
+    const color = document.getElementById("color-picker").value;
     for (let j = 0; j < faceColors.length; ++j) {
-        const c = faceColors[j];
+        const c = rgbToArray(color);
 
         // Repeat each color four times for the four vertices of the face
         colors = colors.concat(c, c, c, c);
@@ -31,3 +32,13 @@ function initBuffer(gl, data){
         colors: colorBuffer,
     };
 }
+
+function rgbToArray(rgbString) {
+    rgbString = rgbString.substring(1);
+  
+    var red = parseInt(rgbString.substring(0, 2), 16) / 255;
+    var green = parseInt(rgbString.substring(2, 4), 16) / 255;
+    var blue = parseInt(rgbString.substring(4, 6), 16) / 255;
+  
+    return [red, green, blue, 1];
+} 

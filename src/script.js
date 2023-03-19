@@ -178,6 +178,10 @@ const handleClickShading = () => {
   resetDefault = 0;
 }
 
+const handleClickColor = () => {
+  renderAllObjects(objects_shaded);
+}
+
 // window.onload = function main() {
 //   const canvas = document.getElementById(`gl-canvas`);
 //   const gl = WebGLUtils.setupWebGL(canvas, {
