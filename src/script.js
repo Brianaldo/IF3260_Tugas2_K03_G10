@@ -156,6 +156,7 @@ const resetConf = () =>{
   document.getElementById("output-scale-z").value = 1;
   document.getElementById("output-cam-rad").value = 0;
   document.getElementById("output-range").value = 60;
+  document.getElementById("color-picker").value = "#00FF00";
   shadingFragment = FRAGMENT_SHADER_LIGHT;
   resetDefault = 1;
   angleAnimation = 0;
