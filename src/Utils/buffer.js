@@ -14,9 +14,46 @@ function initBuffer(gl, data){
 
     // Buat colors
     let colors = [];
-    const color = document.getElementById("color-picker").value;
+    document.getElementById("color-picker").value = arrayToRGB(faceColors[0]);
+    console.log(arrayToRGB(faceColors[0]))
     for (let j = 0; j < faceColors.length; ++j) {
-        const c = rgbToArray(color);
+        const c = faceColors[j];
+
+        // Repeat each color four times for the four vertices of the face
+        colors = colors.concat(c, c, c, c);
+    }
+    
+    const colorBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+
+    return {
+        vertices: verticesBuffer,
+        indices: indexBuffer,
+        colors: colorBuffer,
+    };
+}
+
+function updateBuffer(gl, data){
+    const { vertices, indices, faceColors } = data;
+    // Buat verticesnya
+    const verticesBuffer = gl.createBuffer();
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, verticesBuffer);
+
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    
+    // Buat index
+    const indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(indices), gl.STATIC_DRAW);
+
+    // Buat colors
+    let colors = [];
+    const color = document.getElementById("color-picker").value;
+    const rgbcolor = rgbToArray(color);
+    for (let j = 0; j < faceColors.length; ++j) {
+        const c = rgbcolor;
 
         // Repeat each color four times for the four vertices of the face
         colors = colors.concat(c, c, c, c);
@@ -42,3 +79,10 @@ function rgbToArray(rgbString) {
   
     return [red, green, blue, 1];
 } 
+
+function arrayToRGB(array) {
+    var red = Math.round(array[0] * 255);
+    var green = Math.round(array[1] * 255);
+    var blue = Math.round(array[2] * 255);
+    return "#" + red.toString(16) + green.toString(16) + blue.toString(16);
+}

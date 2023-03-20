@@ -44,6 +44,7 @@ var numRender = 0;
 var resetDefault = 1;
 var isClearCanvas = false;
 var shadingFragment = FRAGMENT_SHADER_LIGHT;
+var isInit = true;
 
 const renderObject = (object)=>{
   const shaderProgram = initShaders(gl, VERTEX_SHADER);
@@ -58,7 +59,14 @@ const renderObject = (object)=>{
       modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
     }
   };
-  const buffers = initBuffer(gl, object);
+  var buffers;
+  if(isInit){
+    buffers = initBuffer(gl, object);
+    isInit = false;
+  }
+  else{
+    buffers = updateBuffer(gl, object);
+  }
   function render() {
     drawObject(gl, programInfo, buffers, object.vertexCount);
     requestAnimationFrame(render);
