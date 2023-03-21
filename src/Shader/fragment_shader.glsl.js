@@ -1,19 +1,17 @@
 const FRAGMENT_SHADER_LIGHT = `
 precision mediump float;
-varying lowp vec3 vColor;
 
-varying float colorFactor;
-void main(void) {
-  gl_FragColor = vec4(vColor * colorFactor, 1.0);
+varying vec4 shadingColor;
+void main() {
+  gl_FragColor = shadingColor;
 }
 `;
 
 const FRAGMENT_SHADER_FLAT = `
 precision mediump float;
-varying lowp vec3 vColor;
+varying lowp vec3 basicColor;
 
-varying float colorFactor;
 void main(void) {
-  gl_FragColor = vec4(vColor, 1.0);
+  gl_FragColor = vec4(basicColor, 1.0);
 }
 `;

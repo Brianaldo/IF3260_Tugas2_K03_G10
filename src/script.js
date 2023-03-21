@@ -16,8 +16,7 @@ canvas.width = innerHeight;
 canvas.height = innerHeight;
 
 gl.viewport(0, 0, canvas.width, canvas.height);
-// gl.clearColor(0.75, 0.85, 0.8, 1.0);
-gl.clearColor(0.0, 0.0, 0.0, 0.76);
+gl.clearColor(0.0, 0.0, 0.0, 0.66);
 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 gl.enable(gl.DEPTH_TEST);
 gl.frontFace(gl.CCW);
@@ -57,6 +56,15 @@ const renderObject = (object)=>{
     uniformLocations: {
       projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
       modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
+      normalMatrixLoc: gl.getUniformLocation(shaderProgram, "normalMat"),
+      lightPosLoc: gl.getUniformLocation(shaderProgram, "lightPos"),
+      ambientColorLoc: gl.getUniformLocation(shaderProgram, "ambientColor"),
+      diffuseColorLoc: gl.getUniformLocation(shaderProgram, "diffuseColor"),
+      specularColorLoc: gl.getUniformLocation(shaderProgram, "specularColor"),
+      shininessLoc: gl.getUniformLocation(shaderProgram, "shininessVal"),
+      kaLoc: gl.getUniformLocation(shaderProgram, "coefKa"),
+      kdLoc: gl.getUniformLocation(shaderProgram, "coefKd"),
+      ksLoc: gl.getUniformLocation(shaderProgram, "coefKs"),
     }
   };
   var buffers;

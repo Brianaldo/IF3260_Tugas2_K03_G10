@@ -270,7 +270,8 @@ class Matrix {
                   -m[0]*m[5]*m[14]+m[0]*m[6]*m[13]+m[4]*m[1]*m[14]-m[4]*m[2]*m[13]-m[12]*m[1]*m[6]+m[12]*m[2]*m[5],
                   m[0]*m[5]*m[10]-m[0]*m[6]*m[9]-m[4]*m[1]*m[10]+m[4]*m[2]*m[9]+m[8]*m[1]*m[6]-m[8]*m[2]*m[5]];
     var det = m[0]*inv[0] + m[1]*inv[4] + m[2]*inv[8] + m[3]*inv[12];
-    if(det==0) throw new Error("Invers doesn't exist!");
+    
+    // Ignore when case det = 0;
     det = 1.0/det;
     for(var i = 0; i<16; i++) inv[i] *= det;
     return inv;

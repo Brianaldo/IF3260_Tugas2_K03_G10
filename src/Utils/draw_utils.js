@@ -4,7 +4,10 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
   gl.depthFunc(gl.LEQUAL);           
   gl.viewport(0.0, 0.0, gl.canvas.clientWidth, gl.canvas.clientHeight);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
+  const lightPos = [document.getElementById("lightX").value, document.getElementById("lightY").value, document.getElementById("lightZ").value];
+  const tempambientColor = rgbToArray(document.getElementById("ambient-color").value);
+  const tempdiffuseColor = rgbToArray(document.getElementById("diffuse-color").value);
+  const tempspecularColor = rgbToArray(document.getElementById("specular-color").value);
   const fieldOfView = 45 * Math.PI / 180;
   const left = 0;
   const top = 0;
@@ -86,8 +89,6 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
         programInfo.attribLocations.vertexPosition);
   }
 
-  
-
   {
     const numComponents = 4;
     const type = gl.FLOAT;
@@ -106,11 +107,37 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
         programInfo.attribLocations.vertexColor);
   }
 
+  {
+    const numComponents = 3;
+    const type = gl.FLOAT;
+    const normalize = false;
+    const stride = 0;
+    const offset = 0;
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertices);
+    gl.vertexAttribPointer(
+        programInfo.attribLocations.normalLoc,
+        numComponents,
+        type,
+        normalize,
+        stride,
+        offset);
+    gl.enableVertexAttribArray(programInfo.attribLocations.normalLoc);
+  }
+
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
   gl.useProgram(programInfo.program);
   gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix,false,projectionMatrix);
   gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix,false,modelViewMatrix);
-
+  gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrixLoc,false,normalMatrix);
+  gl.uniform1f(programInfo.uniformLocations.kaLoc,document.getElementById("ka").value);
+  gl.uniform1f(programInfo.uniformLocations.kdLoc,document.getElementById("kd").value);
+  gl.uniform1f(programInfo.uniformLocations.ksLoc,document.getElementById("ks").value);
+  gl.uniform1f(programInfo.uniformLocations.shininessLoc,document.getElementById("shininess").value);
+  gl.uniform3fv(programInfo.uniformLocations.lightPosLoc,lightPos);
+  gl.uniform3fv(programInfo.uniformLocations.ambientColorLoc,[tempambientColor[0],tempambientColor[1],tempambientColor[2]]);
+  gl.uniform3fv(programInfo.uniformLocations.diffuseColorLoc,[tempdiffuseColor[0],tempdiffuseColor[1],tempdiffuseColor[2]]);
+  gl.uniform3fv(programInfo.uniformLocations.specularColorLoc,[tempspecularColor[0],tempspecularColor[1],tempspecularColor[2]]);
+  
   {
     const type = gl.UNSIGNED_SHORT;
     const offset = 0;

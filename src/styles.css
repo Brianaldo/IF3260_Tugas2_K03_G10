@@ -162,3 +162,15 @@ input[type="text"]{
 #color-picker{
   margin: 12px;
 }
+
+#ambient-color{
+  margin: 12px;
+}
+
+#diffuse-color{
+  margin: 12px;
+}
+
+#specular-color{
+  margin: 12px;
+}
