@@ -42,7 +42,6 @@ var angleAnimation = 0;
 var incAngle = 0.5;
 var numRender = 0;
 var resetDefault = 1;
-var isClearCanvas = false;
 var shadingFragment = FRAGMENT_SHADER_LIGHT;
 var isInit = true;
 
@@ -53,6 +52,7 @@ const renderObject = (object)=>{
     attribLocations: {
       vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
       vertexColor: gl.getAttribLocation(shaderProgram, 'aVertexColor'),
+      normalLoc: gl.getAttribLocation(shaderProgram, 'normal'),
     },
     uniformLocations: {
       projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
@@ -105,37 +105,7 @@ const loadFile = () =>{
   reader.readAsText(file);
 }
 
-const clearCanvas = () => {
-  isClearCanvas = true;
-  console.log("Ini clear");
-  objects_shaded = [];
-  resetConf();
-  // renderAllObjects(objects_shaded);
-};
-
-const saveFile = (object = objects_shaded) => {
-  const fileName = document.getElementById(
-    Array.isArray(object) ? "filename" : "model-filename"
-  ).value;
-
-  if (fileName == "") {
-    alert("Please input the output file name!");
-    return;
-  }
-
-  const content = JSON.stringify(object);
-
-  const file = new Blob([content], {
-    type: "json/javascript",
-  });
-
-  const link = document.createElement("a");
-
-  link.href = URL.createObjectURL(file);
-  link.download = `${fileName}.json`;
-  link.click();
-  URL.revokeObjectURL(link.href);
-};
+renderAllObjects(objects_shaded);
 
 const resetConf = () =>{
   defaultview();

@@ -4,7 +4,7 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
   gl.depthFunc(gl.LEQUAL);           
   gl.viewport(0.0, 0.0, gl.canvas.clientWidth, gl.canvas.clientHeight);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  if(isClearCanvas==true) return;
+
   const fieldOfView = 45 * Math.PI / 180;
   const left = 0;
   const top = 0;
@@ -65,6 +65,9 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
   modelViewMatrix = Matrix.rotate(modelViewMatrix,angleY,[0,1,0]);
   modelViewMatrix = Matrix.rotate(modelViewMatrix,angleZ,[0,0,1]);
   modelViewMatrix = Matrix.scale(modelViewMatrix,[scalesZ, scalesY, scalesX]); 
+
+  var normalMatrix = Matrix.createIdentityMatrix();
+  normalMatrix = Matrix.normalizeMatrix(modelViewMatrix);
   {
     const numComponents = 3;
     const type = gl.FLOAT;
@@ -82,6 +85,8 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
     gl.enableVertexAttribArray(
         programInfo.attribLocations.vertexPosition);
   }
+
+  
 
   {
     const numComponents = 4;
