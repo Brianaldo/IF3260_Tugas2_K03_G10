@@ -24,7 +24,12 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
   if (projectionType === "perspective") {
     projectionMatrix = Matrix.perspective(fieldOfView,aspect,zNear,zFar);
   }else if(projectionType === "oblique"){
-    // Implement here
+    //  Cabinet Projection with alpha and beta equal 45 degree
+    projectionMatrix = Matrix.oblique(45);
+    projectionMatrix = Matrix.multiply(projectionMatrix, Matrix.orthographic(-aspect,aspect,-1.0,1.0,zNear,zFar));
+    projectionMatrix = Matrix.translate(projectionMatrix,[-0.68, 0.68, 0.0]);
+    radius *= (1.90 / 5.5);
+
   }else if(projectionType === "orthographic"){
     projectionMatrix = Matrix.orthographic(-aspect,aspect,-1.0,1.0,zNear,zFar);
     radius *= (1.85 / 5.5);

@@ -105,13 +105,13 @@ class Matrix {
     return matrix;
   }
   
-  static oblique(theta, phi){
-    var cotT = -1 / Math.tan(toRadian(theta));
-    var cotP = -1 / Math.tan(toRadian(phi));
-    let matrix = [1, 0, cotT, 0,
-                  0, 1, cotP, 0,
+  static oblique(theta){
+    //  Cabinet Projection
+    let matrix = [1, 0, -Math.cos(toRadian(theta))/2, 0,
+                  0, 1, Math.sin(toRadian(theta))/2, 0,
                   0, 0, 1, 0,
                   0, 0, 0, 1];
+    
     matrix = Matrix.transpose(matrix);
     return matrix;
   }
