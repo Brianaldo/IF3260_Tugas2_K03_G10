@@ -26,7 +26,8 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
   }else if(projectionType === "oblique"){
     // Implement here
   }else if(projectionType === "orthographic"){
-    // Implement here
+    projectionMatrix = Matrix.orthographic(-aspect,aspect,-1.0,1.0,zNear,zFar);
+    radius *= (1.85 / 5.5);
   }
 
   var modelViewMatrix = Matrix.createIdentityMatrix();

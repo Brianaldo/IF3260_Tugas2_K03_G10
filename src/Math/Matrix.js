@@ -8,6 +8,24 @@ class Matrix {
             0,0,1,0,
             0,0,0,1];
   }
+
+  static multiply(matrix_l, matrix_r){
+    if (matrix_l.cols !== matrix_r.rows) {
+      throw new Error("Matrix dimensions don't match");
+    }
+
+    let result_matrix = [];
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 4; j++) {
+        let sum = 0;
+        for (let k = 0; k < 4; k++) {
+          sum += matrix_l[i*4 + k] * matrix_r[k*4 + j];
+        }
+        result_matrix.push(sum);
+      }
+    }
+    return result_matrix;
+  }
   
   static transpose(matrix){
     return [matrix[0],matrix[4],matrix[8],matrix[12],
@@ -75,6 +93,15 @@ class Matrix {
         matrix[10] = -1;
         matrix[14] = -2 * near;
     }
+    return matrix;
+  }
+
+  static orthographic(left, right, bottom, top, near, far){
+    let lr = 1 / (right-left), bt = 1 / (top-bottom), nf = 1 / (far-near);
+    let matrix = [2 * lr, 0, 0, 0,
+                  0, 2 * bt, 0, 0,
+                  0, 0, -2*nf, -(far+near)/(far-near),
+                  0,0,0,1];
     return matrix;
   }
   

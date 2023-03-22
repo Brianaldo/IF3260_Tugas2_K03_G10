@@ -96,7 +96,6 @@ const changeToLoadFile=(file)=>{
 
 const loadFile = () =>{
   let selectedFile = document.getElementById("load-file").files;
-  console.log("Ini di load file");
   if (selectedFile.length == 0) return;
 
   const file = selectedFile[0]; 
