@@ -89,7 +89,7 @@ const renderObject = (object)=>{
 const changeToLoadFile=(file)=>{
   resetDefault = 1;
   object = JSON.parse(file);
-  tempColorVal = object["faceColors"][0];
+  tempColorVal = object["faceColors"];
   resetConf();
   renderObject(object);
 }
