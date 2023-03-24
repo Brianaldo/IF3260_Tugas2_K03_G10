@@ -1,4 +1,4 @@
-// Draw the scene.
+// Buat Draw Object
 function drawObject(gl, programInfo, buffers, vertexCount) {  
   gl.enable(gl.DEPTH_TEST);          
   gl.depthFunc(gl.LEQUAL);           
