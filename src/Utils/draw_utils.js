@@ -34,7 +34,7 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
     projectionMatrix = Matrix.perspective(fieldOfView,aspect,zNear,zFar);
   }else if(projectionType === "oblique"){
     //  Cabinet Projection with alpha and beta equal 45 degree
-    projectionMatrix = Matrix.oblique(45);
+    projectionMatrix = Matrix.oblique(45,45);
     projectionMatrix = Matrix.multiply(projectionMatrix, Matrix.orthographic(-aspect,aspect,-1.0,1.0,zNear,zFar));
     projectionMatrix = Matrix.translate(projectionMatrix,[-0.94, 0.94, 0.0]);
     radius *= (1.90 / 5.5);
@@ -68,11 +68,11 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
     }
   }
 
-  modelViewMatrix = Matrix.translate(modelViewMatrix,[z,y,x]);
+  modelViewMatrix = Matrix.translate(modelViewMatrix,[x,y,z]);
   modelViewMatrix = Matrix.rotate(modelViewMatrix,angleX,[1,0,0]);
   modelViewMatrix = Matrix.rotate(modelViewMatrix,angleY,[0,1,0]);
   modelViewMatrix = Matrix.rotate(modelViewMatrix,angleZ,[0,0,1]);
-  modelViewMatrix = Matrix.scale(modelViewMatrix,[scalesZ, scalesY, scalesX]); 
+  modelViewMatrix = Matrix.scale(modelViewMatrix,[scalesX, scalesY, scalesZ]); 
 
   var normalMatrix = Matrix.createIdentityMatrix();
   normalMatrix = Matrix.normalizeMatrix(modelViewMatrix);
