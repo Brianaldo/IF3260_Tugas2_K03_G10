@@ -19,7 +19,6 @@ Aplikasi yang dibuat harus bisa digunakan untuk menggambar bidang tiga dimensi y
 _Fork_ repository ini ke komputer Anda terlebih dahulu. Ada 3 cara untuk menjalankan aplikasi:
 1. **Membuka file index.html**
 2. **Menggunakan Visual Studio Code**
-3. **Menggunakan Python HTTP Server**
 
 ### Membuka `index.html` langsung
 1. Pastikan _repository_ ini sudah di-fork
