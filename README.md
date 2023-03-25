@@ -14,6 +14,9 @@ Aplikasi yang dibuat harus bisa digunakan untuk menggambar bidang tiga dimensi y
 3. Jika memiliki kebingungan, silakan gunakan fitur help yang tersedia
 
 ### Kontributor
-13520113	Brianaldo Phandiarta
-13520114	Kevin Roni
-13520137 	Muhammad Gilang Ramadhan
+| NIM           | Nama          | 
+| ------------- | ------------- |
+| 13520113      | Brianaldo Phandiarta |
+| 13520114      | Kevin Roni    |
+| 13520137      | Muhammad Gilang Ramadhan     |
+
