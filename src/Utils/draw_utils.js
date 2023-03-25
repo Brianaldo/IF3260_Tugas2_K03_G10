@@ -17,25 +17,34 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
   const zNear = 0.1;
   const zFar = 1000.0;
   var projectionMatrix = Matrix.createIdentityMatrix();
+  var modelViewMatrix = Matrix.createIdentityMatrix();
   const cameraAngleRadian = ((document.getElementById('cam-rotation').value  - 50.0) * Math.PI) / 25.0;
   const projectionType = document.getElementById('perspectiveOption').value;
   let radius = -((document.getElementById('cam-radius').value - 50.0) / 25.0) + 5.5;
-
+  const angleX = document.getElementById("rotasiX").value / 100;
+  const angleY = document.getElementById("rotasiY").value / 100;
+  const angleZ = document.getElementById("rotasiZ").value / 100;
+  const x = document.getElementById("translasiX").value / 100;
+  const y = document.getElementById("translasiY").value / 100;
+  const z = document.getElementById("translasiZ").value / 100;
+  var scalesX = document.getElementById("scalingX").value;
+  var scalesY = document.getElementById("scalingY").value;
+  var scalesZ = document.getElementById("scalingZ").value;
   if (projectionType === "perspective") {
     projectionMatrix = Matrix.perspective(fieldOfView,aspect,zNear,zFar);
   }else if(projectionType === "oblique"){
     //  Cabinet Projection with alpha and beta equal 45 degree
-    projectionMatrix = Matrix.oblique(45);
+    projectionMatrix = Matrix.oblique(45,45);
     projectionMatrix = Matrix.multiply(projectionMatrix, Matrix.orthographic(-aspect,aspect,-1.0,1.0,zNear,zFar));
-    projectionMatrix = Matrix.translate(projectionMatrix,[-0.68, 0.68, 0.0]);
+    projectionMatrix = Matrix.translate(projectionMatrix,[-0.94, 0.94, 0.0]);
     radius *= (1.90 / 5.5);
-
+    scalesX *= 0.32, scalesY *= 0.32, scalesZ *= 0.32;
   }else if(projectionType === "orthographic"){
     projectionMatrix = Matrix.orthographic(-aspect,aspect,-1.0,1.0,zNear,zFar);
     radius *= (1.85 / 5.5);
+    scalesX *= 0.34, scalesY *= 0.34, scalesZ *= 0.34;
   }
 
-  var modelViewMatrix = Matrix.createIdentityMatrix();
   modelViewMatrix = Matrix.translate(modelViewMatrix,[0.0, 0.0, -radius]);  
   modelViewMatrix = Matrix.rotate(modelViewMatrix,cameraAngleRadian,[0, 1, 0]);           
   
@@ -58,22 +67,12 @@ function drawObject(gl, programInfo, buffers, vertexCount) {
       modelViewMatrix = Matrix.rotate(modelViewMatrix,angleAnimation/100,[0,1,0]);
     }
   }
-  
-  const angleX = document.getElementById("rotasiX").value / 100;
-  const angleY = document.getElementById("rotasiY").value / 100;
-  const angleZ = document.getElementById("rotasiZ").value / 100;
-  const x = document.getElementById("translasiX").value / 100;
-  const y = document.getElementById("translasiY").value / 100;
-  const z = document.getElementById("translasiZ").value / 100;
-  const scalesX = document.getElementById("scalingX").value;
-  const scalesY = document.getElementById("scalingY").value;
-  const scalesZ = document.getElementById("scalingZ").value;
 
-  modelViewMatrix = Matrix.translate(modelViewMatrix,[z,y,x]);
+  modelViewMatrix = Matrix.translate(modelViewMatrix,[x,y,z]);
   modelViewMatrix = Matrix.rotate(modelViewMatrix,angleX,[1,0,0]);
   modelViewMatrix = Matrix.rotate(modelViewMatrix,angleY,[0,1,0]);
   modelViewMatrix = Matrix.rotate(modelViewMatrix,angleZ,[0,0,1]);
-  modelViewMatrix = Matrix.scale(modelViewMatrix,[scalesZ, scalesY, scalesX]); 
+  modelViewMatrix = Matrix.scale(modelViewMatrix,[scalesX, scalesY, scalesZ]); 
 
   var normalMatrix = Matrix.createIdentityMatrix();
   normalMatrix = Matrix.normalizeMatrix(modelViewMatrix);

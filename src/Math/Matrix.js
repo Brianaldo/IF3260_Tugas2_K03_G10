@@ -100,7 +100,7 @@ class Matrix {
     let lr = 1 / (right-left), bt = 1 / (top-bottom), nf = 1 / (far-near);
     let matrix = [2 * lr, 0, 0, 0,
                   0, 2 * bt, 0, 0,
-                  0, 0, -2*nf, -(far+near)/(far-near),
+                  0, 0, -2*nf, 0,
                   0,0,0,1];
     return matrix;
   }
